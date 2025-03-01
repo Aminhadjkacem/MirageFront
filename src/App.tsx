@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 //import { UserType } from './types';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import Dashboard from './components/Dashboard';
 import ClientManagement from './components/ClientManagement';
+import { useState } from 'react';
 export type UserType = {
   name: string;
   email: string;

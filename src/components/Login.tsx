@@ -1,6 +1,16 @@
-import React, { useState } from 'react';
 import { LogIn, UserPlus } from 'lucide-react';
+import axios from 'axios';
 import type { UserType } from '../App';
+import { useState } from 'react';
+
+const API_BASE_URL = 'https://localhost:7060';
+
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 type LoginProps = {
   onLogin: (user: UserType) => void;
@@ -8,65 +18,60 @@ type LoginProps = {
 };
 
 export default function Login({ onLogin, onSwitchToSignUp }: LoginProps) {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you would validate credentials here
-    onLogin({ name: 'John Doe', email });
+    setError(null);
+    try {
+      const response = await axiosInstance.post('Users/authenticate', { username, password });
+      onLogin(response.data);
+    } catch (err) {
+      console.error('Login failed:', err);
+      setError('Invalid username or password');
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
         <div className="flex flex-col items-center">
-          <img 
-            src="logo.png" 
-            alt="DHP Manager Logo" 
-            className="h-16 w-16 mb-4"
-          />
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">
-            DHP Manager
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Please sign in to your account
-          </p>
+          <img src="logo.png" alt="DHP Manager Logo" className="h-16 w-16 mb-4" />
+          <h2 className="text-center text-3xl font-extrabold text-gray-900">DHP Manager</h2>
+          <p className="mt-2 text-center text-sm text-gray-600">Please sign in to your account</p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
+              <label htmlFor="username" className="sr-only">Username</label>
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="username"
+                name="username"
+                type="text"
                 required
-                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                className="appearance-none rounded-lg block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
+              <label htmlFor="password" className="sr-only">Password</label>
               <input
                 id="password"
                 name="password"
                 type="password"
                 required
-                className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-lg block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>
-
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
           <div>
             <button
               type="submit"
@@ -79,7 +84,6 @@ export default function Login({ onLogin, onSwitchToSignUp }: LoginProps) {
             </button>
           </div>
         </form>
-
         <div className="text-center">
           <button
             onClick={onSwitchToSignUp}
