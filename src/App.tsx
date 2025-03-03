@@ -6,12 +6,13 @@ import Dashboard from './components/Dashboard';
 import ClientManagement from './components/ClientManagement';
 import { useState } from 'react';
 export type UserType = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-} | null;
-function App() {
-  const [user, setUser] = useState<UserType>(null);
+};
 
+function App() {
+  const [user, setUser] = useState<UserType | null>(null);
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">

@@ -141,7 +141,7 @@ export default function ClientManagement() {
       } else {
         const company = selectedClient as CompanyClient;
         // For company clients, we use the id for deletion according to the API
-        await deleteCompanyClient(company.id || '');
+        await deleteCompanyClient(company.matriculeFiscal || '');
         setCompanyClients(companyClients.filter(c => c.id !== company.id));
         showNotification('Company deleted successfully', 'success');
       }

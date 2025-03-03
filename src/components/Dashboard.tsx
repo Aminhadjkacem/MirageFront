@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { Users, Truck, Receipt, User, LogOut, ChevronDown, Building2, Calculator, Users2 } from 'lucide-react';
+import { Users, Truck, Receipt, User, LogOut, ChevronDown, Calculator, Users2 } from 'lucide-react';
 import type { UserType } from '../App';
 
 type DashboardProps = {
@@ -27,7 +27,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
                 <User className="h-6 w-6 text-white" />
               </div>
-              <span className="text-gray-700 font-medium">{user?.name}</span>
+              <span className="text-gray-700 font-medium">{user?.firstName}</span>
               <ChevronDown className="h-5 w-5 text-gray-500" />
             </button>
 

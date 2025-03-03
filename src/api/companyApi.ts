@@ -77,9 +77,9 @@ export const updateCompanyClient = async (taxNumber: string, companyData: Compan
 };
 
 // Function to delete a company client
-export const deleteCompanyClient = async (id: string): Promise<void> => {
+export const deleteCompanyClient = async (matriculeFiscal: string): Promise<void> => {
   try {
-    await axiosInstance.delete(`/CompanyCustomer/${id}`);
+    await axiosInstance.delete(`/CompanyCustomer/${matriculeFiscal}`);
   } catch (error) {
     console.error('Error deleting company client:', error);
     throw error;
