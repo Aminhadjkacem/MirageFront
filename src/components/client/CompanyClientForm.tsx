@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { CompanyClient } from '../types/client';
-import { createCompanyClient, mapCompanyClientToApiData } from '../api/companyApi';
+import { CompanyClient } from '../../types/client';
+import { createCompanyClient, mapCompanyClientToApiData } from '../../api/companyApi';
 
 interface CompanyClientFormProps {
   client?: CompanyClient;

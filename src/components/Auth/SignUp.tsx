@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { UserPlus, LogIn } from 'lucide-react';
-import type { UserType } from '../App';
+import type { UserType } from '../../App';
 import axios from 'axios';
 const API_BASE_URL = 'https://localhost:7060';
 const axiosInstance = axios.create({

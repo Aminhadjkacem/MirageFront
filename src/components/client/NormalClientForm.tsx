@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AlertCircle } from 'lucide-react';
-import type { NormalClient } from '../types/client';
-import { createNormalClient, mapNormalClientToApiData } from '../api/clientApi';
+import type { NormalClient } from '../../types/client';
+import { createNormalClient, mapNormalClientToApiData } from '../../api/clientApi';
 
 type NormalClientFormProps = {
   client?: NormalClient;

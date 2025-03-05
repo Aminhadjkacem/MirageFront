@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { Users, Truck, Receipt, User, LogOut, ChevronDown, Calculator, Users2 } from 'lucide-react';
-import type { UserType } from '../App';
+import { Users, Truck, User, LogOut, ChevronDown, Calculator, Users2, Package } from 'lucide-react';
+import type { UserType } from '../../App';
 
 type DashboardProps = {
   user: UserType;
@@ -54,6 +54,14 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             <span className="text-lg font-medium text-gray-900">Clients</span>
           </Link>
 
+          {/* Products Button */}
+          <Link to="/products" className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
+              <Package className="h-8 w-8 text-indigo-600" />
+            </div>
+            <span className="text-lg font-medium text-gray-900">Products</span>
+          </Link>
+
           {/* Fournisseur Button */}
           <button className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
@@ -62,28 +70,21 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             <span className="text-lg font-medium text-gray-900">Fournisseur</span>
           </button>
 
-          {/* Facturation Button */}
-          <button className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center">
-              <Receipt className="h-8 w-8 text-purple-600" />
+          {/* Comptabilité Button */}
+          <Link to="/comptability" className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+              <Calculator className="h-8 w-8 text-red-600" />
             </div>
-            <span className="text-lg font-medium text-gray-900">Facturation</span>
-          </button>
-                      {/* Comptabilité Button */}
-                      <button className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-                <Calculator className="h-8 w-8 text-red-600" />
-              </div>
-              <span className="text-lg font-medium text-gray-900">Comptabilité</span>
-            </button>
+            <span className="text-lg font-medium text-gray-900">Comptabilité</span>
+          </Link>
 
-            {/* RH Button */}
-            <button className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center">
-                <Users2 className="h-8 w-8 text-teal-600" />
-              </div>
-              <span className="text-lg font-medium text-gray-900">RH</span>
-            </button>
+          {/* RH Button */}
+          <button className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center">
+              <Users2 className="h-8 w-8 text-teal-600" />
+            </div>
+            <span className="text-lg font-medium text-gray-900">RH</span>
+          </button>
         </div>
       </main>
     </div>

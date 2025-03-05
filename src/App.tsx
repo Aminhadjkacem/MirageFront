@@ -1,10 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-//import { UserType } from './types';
-import Login from './components/Login';
-import SignUp from './components/SignUp';
-import Dashboard from './components/Dashboard';
-import ClientManagement from './components/ClientManagement';
 import { useState } from 'react';
+import Login from './components/Auth/Login';
+import SignUp from './components/Auth/SignUp';
+import Dashboard from './components/dashboard/Dashboard';
+import ClientManagement from './components/client/ClientManagement';
+import ProductManagement from './components/products/ProductManagement';
+import Comptability from '../src/components/comptability/index';
+
 export type UserType = {
   firstName: string;
   lastName: string;
@@ -32,8 +34,11 @@ function App() {
           ) : (
             <>
               <Route path="/dashboard" element={<Dashboard user={user} onLogout={() => setUser(null)} />} />
-              <Route path="*" element={<Navigate to="/dashboard" />} />
               <Route path="/clients" element={<ClientManagement />} />
+              <Route path="/products" element={<ProductManagement />} />
+              <Route path="*" element={<Navigate to="/dashboard" />} />
+              <Route path="/comptability/*" element={<Comptability />} />
+
             </>
           )}
         </Routes>
@@ -42,4 +47,4 @@ function App() {
   );
 }
 
-export default App;
+export default App

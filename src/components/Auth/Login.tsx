@@ -1,6 +1,6 @@
 import { LogIn, UserPlus } from 'lucide-react';
 import axios from 'axios';
-import type { UserType } from '../App';
+import type { UserType } from '../../App';
 import { useState } from 'react';
 
 const API_BASE_URL = 'https://localhost:7060';

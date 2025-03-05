@@ -1,5 +1,5 @@
-import NormalClientForm from '../NormalClientForm';
-import CompanyClientForm from '../CompanyClientForm';
+import NormalClientForm from './NormalClientForm';
+import CompanyClientForm from './CompanyClientForm';
 import type { NormalClient, CompanyClient } from '../../types/client';
 
 interface ClientFormContainerProps {

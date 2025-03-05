@@ -1,28 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
-import type { NormalClient, CompanyClient } from '../types/client';
-import ClientList from '../components/client/ClientList';
-import ClientDetails from '../components/client/ClientDetails';
-import DeleteConfirmationModal from '../components/client/DeleteConfirmationModal';
-import ClientManagementHeader from '../components/client/ClientManagementHeader';
-import ClientTabs from '../components/client/ClientTabs';
-import ClientFormContainer from '../components/client/ClientFormContainer';
-import EmptyClientState from '../components/client/EmptyClientState';
-import Notification from '../components/client/Notification';
-import ErrorMessage from '../components/client/ErrorMessage';
+import type { NormalClient, CompanyClient } from '../../types/client';
+import ClientList from './ClientList';
+import ClientDetails from './ClientDetails';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
+import ClientManagementHeader from './ClientManagementHeader';
+import ClientTabs from './ClientTabs';
+import ClientFormContainer from './ClientFormContainer';
+import EmptyClientState from './EmptyClientState';
+import Notification from './Notification';
+import ErrorMessage from './ErrorMessage';
 import { 
   getNormalClients, 
   updateNormalClient, 
   deleteNormalClient,
   mapApiDataToNormalClient,
   mapNormalClientToApiData,
-} from '../api/clientApi';
+} from '../../api/clientApi';
 import {
   getCompanyClients,
   updateCompanyClient,
   deleteCompanyClient,
   mapApiDataToCompanyClient,
   mapCompanyClientToApiData,
-} from '../api/companyApi';
+} from '../../api/companyApi';
 
 
 export default function ClientManagement() {
