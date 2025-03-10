@@ -1,16 +1,23 @@
-export type Product = {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
-    stock: number;
-    category: string;
-  };
-  
-  export type FormData = {
-    name: string;
-    description: string;
-    price: string;
-    stock: string;
-    category: string;
-  };
+export interface Product {
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: string;
+}
+
+export interface ProductInput {
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: string;
+}
+
+export interface ProductFormData {
+  name: string;
+  description: string;
+  price: string;
+  stock: string;
+  category: string;
+}

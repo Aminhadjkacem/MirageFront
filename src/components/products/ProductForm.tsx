@@ -1,29 +1,23 @@
+import React from 'react';
 import { X, Save } from 'lucide-react';
-
-interface FormData {
-  name: string;
-  description: string;
-  price: string;
-  stock: string;
-  category: string;
-}
+import { ProductFormData } from '../../types/product';
 
 interface ProductFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (e: React.FormEvent) => void;
-  formData: FormData;
-  setFormData: (data: FormData) => void;
+  onSubmit: (e: React.FormEvent) => Promise<void>;
+  formData: ProductFormData;
+  setFormData: React.Dispatch<React.SetStateAction<ProductFormData>>;
   isEditing: boolean;
 }
 
 export default function ProductForm({
   isOpen,
   onClose,
-  onSubmit,
   formData,
   setFormData,
-  isEditing
+  isEditing,
+  onSubmit,
 }: ProductFormProps) {
   if (!isOpen) return null;
 
@@ -31,13 +25,8 @@ export default function ProductForm({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-lg max-w-md w-full p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold">
-            {isEditing ? 'Edit Product' : 'Add New Product'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
+          <h2 className="text-xl font-semibold">{isEditing ? 'Edit Product' : 'Add New Product'}</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="h-5 w-5" />
           </button>
         </div>
