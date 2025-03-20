@@ -3,10 +3,12 @@ import { Plus, FileDown, ArrowRight, Pencil, Trash, X } from 'lucide-react';
 
 type Product = {
   name: string;
+  quantity: number;
 };
 
 type DevisItem = {
   id: number;
+  projectName: string; // Added projectName field
   designations: Array<{
     title: string;
     products: Product[];
@@ -18,12 +20,13 @@ export default function Devis() {
   const [devis, setDevis] = useState<DevisItem[]>([
     {
       id: 1,
+      projectName: "Initial Project", // Added projectName to initial data
       designations: [
         {
           title: "Project A",
           products: [
-            { name: "Product 1" },
-            { name: "Product 2" }
+            { name: "Product 1", quantity: 1 },
+            { name: "Product 2", quantity: 2 }
           ]
         }
       ],
@@ -33,15 +36,17 @@ export default function Devis() {
 
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<{
+    projectName: string; // Added projectName to formData
     designations: Array<{
       title: string;
-      products: Array<{ name: string }>;
+      products: Array<{ name: string; quantity: number }>;
     }>;
   }>({
+    projectName: '',
     designations: [
       {
         title: '',
-        products: [{ name: '' }]
+        products: [{ name: '', quantity: 1 }]
       }
     ]
   });
@@ -53,7 +58,7 @@ export default function Devis() {
         ...formData.designations,
         {
           title: '',
-          products: [{ name: '' }]
+          products: [{ name: '', quantity: 1 }]
         }
       ]
     });
@@ -61,7 +66,7 @@ export default function Devis() {
 
   const addNewProduct = (designationIndex: number) => {
     const newDesignations = [...formData.designations];
-    newDesignations[designationIndex].products.push({ name: '' });
+    newDesignations[designationIndex].products.push({ name: '', quantity: 1 });
     setFormData({ ...formData, designations: newDesignations });
   };
 
@@ -89,10 +94,18 @@ export default function Devis() {
     setFormData({ ...formData, designations: newDesignations });
   };
 
-  const updateProduct = (designationIndex: number, productIndex: number, name: string) => {
+  const updateProduct = (designationIndex: number, productIndex: number, field: 'name' | 'quantity', value: string | number) => {
     const newDesignations = [...formData.designations];
-    newDesignations[designationIndex].products[productIndex].name = name;
+    if (field === 'name') {
+      newDesignations[designationIndex].products[productIndex].name = value as string;
+    } else {
+      newDesignations[designationIndex].products[productIndex].quantity = Number(value);
+    }
     setFormData({ ...formData, designations: newDesignations });
+  };
+
+  const updateProjectName = (projectName: string) => {
+    setFormData({ ...formData, projectName });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -100,10 +113,12 @@ export default function Devis() {
     
     const newDevis: DevisItem = {
       id: devis.length + 1,
+      projectName: formData.projectName, // Include projectName in new devis
       designations: formData.designations.map(designation => ({
         title: designation.title,
         products: designation.products.map(product => ({
-          name: product.name
+          name: product.name,
+          quantity: product.quantity
         }))
       })),
       createdAt: new Date().toISOString().split('T')[0]
@@ -112,10 +127,11 @@ export default function Devis() {
     setDevis([...devis, newDevis]);
     setShowForm(false);
     setFormData({
+      projectName: '', // Reset projectName
       designations: [
         {
           title: '',
-          products: [{ name: '' }]
+          products: [{ name: '', quantity: 1 }]
         }
       ]
     });
@@ -149,6 +165,19 @@ export default function Devis() {
 
         {showForm && (
           <form onSubmit={handleSubmit} className="mb-6 bg-gray-50 p-4 rounded-md space-y-6">
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Project Name
+              </label>
+              <input
+                type="text"
+                value={formData.projectName}
+                onChange={(e) => updateProjectName(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              />
+            </div>
+
             {formData.designations.map((designation, designationIndex) => (
               <div key={designationIndex} className="border border-gray-200 rounded-md p-4 relative">
                 <div className="mb-4">
@@ -185,8 +214,17 @@ export default function Devis() {
                         type="text"
                         placeholder="Product name"
                         value={product.name}
-                        onChange={(e) => updateProduct(designationIndex, productIndex, e.target.value)}
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        onChange={(e) => updateProduct(designationIndex, productIndex, 'name', e.target.value)}
+                        className="block w-2/3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        required
+                      />
+                      <input
+                        type="number"
+                        placeholder="Quantity"
+                        value={product.quantity}
+                        min="1"
+                        onChange={(e) => updateProduct(designationIndex, productIndex, 'quantity', e.target.value)}
+                        className="block w-1/3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                         required
                       />
                       {designation.products.length > 1 && (
@@ -230,10 +268,11 @@ export default function Devis() {
                 onClick={() => {
                   setShowForm(false);
                   setFormData({
+                    projectName: '',
                     designations: [
                       {
                         title: '',
-                        products: [{ name: '' }]
+                        products: [{ name: '', quantity: 1 }]
                       }
                     ]
                   });
@@ -257,7 +296,7 @@ export default function Devis() {
             <thead>
               <tr>
                 <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Designations & Products
+                  Project / Designations / Products
                 </th>
                 <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
@@ -272,13 +311,14 @@ export default function Devis() {
                 <tr key={devisItem.id}>
                   <td className="px-6 py-4 text-sm text-gray-900">
                     <div className="space-y-4">
+                      <div className="font-bold text-gray-900 mb-2">{devisItem.projectName}</div>
                       {devisItem.designations.map((designation, index) => (
-                        <div key={index}>
+                        <div key={index} className="ml-4">
                           <div className="font-medium text-gray-900 mb-2">{designation.title}</div>
                           <div className="pl-4 space-y-1">
                             {designation.products.map((product, productIndex) => (
                               <div key={productIndex} className="text-gray-600">
-                                {product.name}
+                                {product.name} (Qty: {product.quantity})
                               </div>
                             ))}
                           </div>
