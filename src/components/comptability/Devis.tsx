@@ -1,5 +1,7 @@
+// Devis.tsx (optimized final version)
 import { useState } from 'react';
-import { Plus, FileDown, ArrowRight, Pencil, Trash, X } from 'lucide-react';
+import { Plus, FileDown, ArrowRight, Pencil, Trash, X, Eye } from 'lucide-react';
+import { QuotationModal } from './QuotationModal';
 
 type Product = {
   name: string;
@@ -8,7 +10,9 @@ type Product = {
 
 type DevisItem = {
   id: number;
-  projectName: string; // Added projectName field
+  projectName: string;
+  customerName: string;
+  clientType: 'Normal' | 'Company';
   designations: Array<{
     title: string;
     products: Product[];
@@ -20,7 +24,9 @@ export default function Devis() {
   const [devis, setDevis] = useState<DevisItem[]>([
     {
       id: 1,
-      projectName: "Initial Project", // Added projectName to initial data
+      projectName: "Initial Project",
+      customerName: "John Doe",
+      clientType: "Normal",
       designations: [
         {
           title: "Project A",
@@ -35,14 +41,20 @@ export default function Devis() {
   ]);
 
   const [showForm, setShowForm] = useState(false);
+  const [selectedQuotation, setSelectedQuotation] = useState<{ item: DevisItem; editMode: boolean } | null>(null); // Updated state to track edit mode
+
   const [formData, setFormData] = useState<{
-    projectName: string; // Added projectName to formData
+    projectName: string;
+    customerName: string;
+    clientType: 'Normal' | 'Company';
     designations: Array<{
       title: string;
       products: Array<{ name: string; quantity: number }>;
     }>;
   }>({
     projectName: '',
+    customerName: '',
+    clientType: 'Normal',
     designations: [
       {
         title: '',
@@ -108,12 +120,22 @@ export default function Devis() {
     setFormData({ ...formData, projectName });
   };
 
+  const updateCustomerName = (customerName: string) => {
+    setFormData({ ...formData, customerName });
+  };
+
+  const updateClientType = (clientType: 'Normal' | 'Company') => {
+    setFormData({ ...formData, clientType });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     const newDevis: DevisItem = {
       id: devis.length + 1,
-      projectName: formData.projectName, // Include projectName in new devis
+      projectName: formData.projectName,
+      customerName: formData.customerName,
+      clientType: formData.clientType,
       designations: formData.designations.map(designation => ({
         title: designation.title,
         products: designation.products.map(product => ({
@@ -127,7 +149,9 @@ export default function Devis() {
     setDevis([...devis, newDevis]);
     setShowForm(false);
     setFormData({
-      projectName: '', // Reset projectName
+      projectName: '',
+      customerName: '',
+      clientType: 'Normal',
       designations: [
         {
           title: '',
@@ -139,6 +163,12 @@ export default function Devis() {
 
   const handleDelete = (id: number) => {
     setDevis(devis.filter(item => item.id !== id));
+    if (selectedQuotation?.item.id === id) setSelectedQuotation(null);
+  };
+
+  const handleUpdate = (updatedDevis: DevisItem) => {
+    setDevis(devis.map(item => item.id === updatedDevis.id ? updatedDevis : item));
+    setSelectedQuotation({ item: updatedDevis, editMode: false }); // After update, switch to view mode
   };
 
   const exportToPDF = () => {
@@ -147,6 +177,14 @@ export default function Devis() {
 
   const convertToFacture = (id: number) => {
     console.log('Converting to facture...', id);
+  };
+
+  const showQuotation = (devisItem: DevisItem) => {
+    setSelectedQuotation({ item: devisItem, editMode: false }); // Open in view mode
+  };
+
+  const editQuotation = (devisItem: DevisItem) => {
+    setSelectedQuotation({ item: devisItem, editMode: true }); // Open in edit mode
   };
 
   return (
@@ -165,7 +203,35 @@ export default function Devis() {
 
         {showForm && (
           <form onSubmit={handleSubmit} className="mb-6 bg-gray-50 p-4 rounded-md space-y-6">
-            <div className="mb-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Customer Name
+                </label>
+                <input
+                  type="text"
+                  value={formData.customerName}
+                  onChange={(e) => updateCustomerName(e.target.value)}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Client Type
+                </label>
+                <select
+                  value={formData.clientType}
+                  onChange={(e) => updateClientType(e.target.value as 'Normal' | 'Company')}
+                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                >
+                  <option value="Normal">Normal</option>
+                  <option value="Company">Company</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Project Name
               </label>
@@ -269,6 +335,8 @@ export default function Devis() {
                   setShowForm(false);
                   setFormData({
                     projectName: '',
+                    customerName: '',
+                    clientType: 'Normal',
                     designations: [
                       {
                         title: '',
@@ -296,7 +364,13 @@ export default function Devis() {
             <thead>
               <tr>
                 <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Project / Designations / Products
+                  Client / Project
+                </th>
+                <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Designations
+                </th>
+                <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Products
                 </th>
                 <th className="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
@@ -309,19 +383,35 @@ export default function Devis() {
             <tbody className="bg-white divide-y divide-gray-200">
               {devis.map((devisItem) => (
                 <tr key={devisItem.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div className="font-bold text-gray-900">
+                      {devisItem.customerName}
+                    </div>
+                    <div className="text-gray-600">
+                      ({devisItem.clientType})
+                    </div>
+                    <div className="mt-2 text-gray-700">
+                      Project: {devisItem.projectName}
+                    </div>
+                  </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
-                    <div className="space-y-4">
-                      <div className="font-bold text-gray-900 mb-2">{devisItem.projectName}</div>
+                    <div className="space-y-2">
                       {devisItem.designations.map((designation, index) => (
-                        <div key={index} className="ml-4">
-                          <div className="font-medium text-gray-900 mb-2">{designation.title}</div>
-                          <div className="pl-4 space-y-1">
-                            {designation.products.map((product, productIndex) => (
-                              <div key={productIndex} className="text-gray-600">
-                                {product.name} (Qty: {product.quantity})
-                              </div>
-                            ))}
-                          </div>
+                        <div key={index} className="font-medium text-gray-900">
+                          {designation.title}
+                        </div>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">
+                    <div className="space-y-2">
+                      {devisItem.designations.map((designation, index) => (
+                        <div key={index}>
+                          {designation.products.map((product, productIndex) => (
+                            <div key={productIndex} className="text-gray-600">
+                              {product.name} (Qty: {product.quantity})
+                            </div>
+                          ))}
                         </div>
                       ))}
                     </div>
@@ -332,7 +422,14 @@ export default function Devis() {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end space-x-3">
                       <button
-                        onClick={() => exportToPDF()}
+                        onClick={() => showQuotation(devisItem)}
+                        className="text-green-600 hover:text-green-900"
+                        title="Show Quotation"
+                      >
+                        <Eye className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={exportToPDF}
                         className="text-gray-600 hover:text-gray-900"
                         title="Export PDF"
                       >
@@ -345,7 +442,11 @@ export default function Devis() {
                       >
                         <ArrowRight className="h-5 w-5" />
                       </button>
-                      <button className="text-yellow-600 hover:text-yellow-900" title="Edit">
+                      <button
+                        onClick={() => editQuotation(devisItem)}
+                        className="text-yellow-600 hover:text-yellow-900"
+                        title="Edit"
+                      >
                         <Pencil className="h-5 w-5" />
                       </button>
                       <button
@@ -362,6 +463,18 @@ export default function Devis() {
             </tbody>
           </table>
         </div>
+
+        {selectedQuotation && (
+          <QuotationModal
+            devisItem={selectedQuotation.item}
+            onClose={() => setSelectedQuotation(null)}
+            onExportPDF={exportToPDF}
+            onConvertToFacture={convertToFacture}
+            onDelete={handleDelete}
+            onUpdate={handleUpdate}
+            initialEditMode={selectedQuotation.editMode}
+          />
+        )}
       </div>
     </div>
   );

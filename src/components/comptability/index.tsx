@@ -1,4 +1,4 @@
-import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { FileText, Receipt, Truck as TruckDelivery, ArrowLeft } from 'lucide-react';
 import Devis from './Devis';
 
@@ -7,7 +7,9 @@ export default function Comptability() {
   const navigate = useNavigate();
 
   const isActive = (path: string) => {
-    return location.pathname.includes(path) ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300';
+    return location.pathname === `/comptability${path}` || (path === '/devis' && location.pathname === '/comptability')
+      ? 'border-blue-500 text-blue-600'
+      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300';
   };
 
   return (
@@ -26,21 +28,21 @@ export default function Comptability() {
             <div className="flex space-x-8">
               <Link
                 to="/comptability/devis"
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive('devis')}`}
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive('/devis')}`}
               >
                 <FileText className="h-4 w-4 mr-2" />
                 Devis
               </Link>
               <Link
                 to="/comptability/factures"
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive('factures')}`}
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive('/factures')}`}
               >
                 <Receipt className="h-4 w-4 mr-2" />
                 Factures
               </Link>
               <Link
                 to="/comptability/bon-livraison"
-                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive('bon-livraison')}`}
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${isActive('/bon-livraison')}`}
               >
                 <TruckDelivery className="h-4 w-4 mr-2" />
                 Bon de livraison
@@ -53,7 +55,7 @@ export default function Comptability() {
       {/* Content */}
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <Routes>
-          <Route index element={<Devis />} />
+          <Route index element={<Navigate to="/comptability/devis" replace />} />
           <Route path="devis" element={<Devis />} />
           <Route path="factures" element={<div>Factures Component (Coming Soon)</div>} />
           <Route path="bon-livraison" element={<div>Bon de livraison Component (Coming Soon)</div>} />
