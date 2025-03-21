@@ -1,5 +1,5 @@
 export interface NormalClient {
-  id?: string;
+  id?: number;
   fullName: string;
   phoneNumber: string;
   address: string;
@@ -8,7 +8,7 @@ export interface NormalClient {
 }
 
 export interface CompanyClient {
-  id?: string;
+  id?: number;
   companyName: string;
   address: string;
   city: string;

@@ -13,18 +13,18 @@ const axiosInstance = axios.create({
 
 // Define an interface for Company Client Data (based on expected structure)
 export interface CompanyApiData {
-  id?: string;
-  companyName: string;
-  address: string;
-  ville: string;
-  email: string;
-  matriculeFiscal: string;
-  contact1Name: string;
-  contact1Phone: string;
-  contact2Name: string;
-  contact2Phone: string;
-  contact3Name: string;
-  contact3Phone: string;
+  Id?: number; // Matches your backend
+  CompanyName: string; // PascalCase
+  Address: string;
+  Ville: string; // Assuming this is 'city' in French
+  Email: string;
+  MatriculeFiscal: string;
+  Contact1Name: string;
+  Contact1Phone: string;
+  Contact2Name: string;
+  Contact2Phone: string;
+  Contact3Name: string;
+  Contact3Phone: string;
 }
 
 
@@ -89,33 +89,33 @@ export const deleteCompanyClient = async (matriculeFiscal: string): Promise<void
 // Helper function to map API data to our company client interface
 export const mapApiDataToCompanyClient = (apiData: CompanyApiData): CompanyClient => {
   return {
-    companyName: apiData.companyName,
-    address: apiData.address,
-    city: apiData.ville,
-    email: apiData.email,
-    matriculeFiscal: apiData.matriculeFiscal,
-    contact1Name: apiData.contact1Name || '',
-    contact1Phone: apiData.contact1Phone || '',
-    contact2Name: apiData.contact2Name || '',
-    contact2Phone: apiData.contact2Phone || '',
-    contact3Name: apiData.contact3Name || '',
-    contact3Phone: apiData.contact3Phone || ''
+    id: apiData.Id, // Map Id to id
+    companyName: apiData.CompanyName,
+    address: apiData.Address,
+    city: apiData.Ville,
+    email: apiData.Email,
+    matriculeFiscal: apiData.MatriculeFiscal,
+    contact1Name: apiData.Contact1Name || '',
+    contact1Phone: apiData.Contact1Phone || '',
+    contact2Name: apiData.Contact2Name || '',
+    contact2Phone: apiData.Contact2Phone || '',
+    contact3Name: apiData.Contact3Name || '',
+    contact3Phone: apiData.Contact3Phone || ''
   };
 };
-
 // Helper function to map our company client interface to API data
 export const mapCompanyClientToApiData = (client: CompanyClient): CompanyApiData => {
   return {
-    companyName: client.companyName,
-    address: client.address, 
-    ville: client.city,
-    email: client.email,
-    matriculeFiscal: client.matriculeFiscal,
-    contact1Name: client.contact1Name || '',
-    contact1Phone: client.contact1Phone || '',
-    contact2Name: client.contact2Name || '',
-    contact2Phone: client.contact2Phone || '',
-    contact3Name: client.contact3Name || '',
-    contact3Phone: client.contact3Phone || ''
+    CompanyName: client.companyName,
+    Address: client.address, 
+    Ville: client.city,
+    Email: client.email,
+    MatriculeFiscal: client.matriculeFiscal,
+    Contact1Name: client.contact1Name || '',
+    Contact1Phone: client.contact1Phone || '',
+    Contact2Name: client.contact2Name || '',
+    Contact2Phone: client.contact2Phone || '',
+    Contact3Name: client.contact3Name || '',
+    Contact3Phone: client.contact3Phone || ''
   };
 };

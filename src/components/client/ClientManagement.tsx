@@ -12,6 +12,7 @@ import ErrorMessage from './ErrorMessage';
 import { 
   getNormalClients, 
   updateNormalClient, 
+  createNormalClient,
   deleteNormalClient,
   mapApiDataToNormalClient,
   mapNormalClientToApiData,
@@ -20,6 +21,7 @@ import {
   getCompanyClients,
   updateCompanyClient,
   deleteCompanyClient,
+  createCompanyClient,
   mapApiDataToCompanyClient,
   mapCompanyClientToApiData,
 } from '../../api/companyApi';
@@ -49,12 +51,17 @@ export default function ClientManagement() {
       try {
         if (activeTab === 'normal') {
           const apiClients = await getNormalClients();
-          const mappedClients = apiClients.map(client => mapApiDataToNormalClient(client));
+          const mappedClients = apiClients.map(client => {
+            const mapped = mapApiDataToNormalClient(client);
+            console.log('Mapped client:', mapped); // Log each mapped client
+            return mapped;
+          });
           setNormalClients(mappedClients);
         } else {
           const apiCompanies = await getCompanyClients();
           const mappedCompanies = apiCompanies.map(company => mapApiDataToCompanyClient(company));
-          setCompanyClients(mappedCompanies);
+        setCompanyClients(mappedCompanies);
+        console.log('Company clients set:', mappedCompanies); // Verify data
         }
       } catch (err) {
         setError(`Failed to fetch ${activeTab === 'normal' ? 'clients' : 'companies'}. Please try again later.`);
@@ -63,10 +70,7 @@ export default function ClientManagement() {
         setIsLoading(false);
       }
     };
-
     fetchClients();
-    
-    // Reset selected client when switching tabs
     setSelectedClient(null);
     setShowForm(false);
     setIsEditing(false);
@@ -97,13 +101,13 @@ export default function ClientManagement() {
   };
 
   const filteredNormalClients = normalClients.filter(client =>
-    client.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.phoneNumber.includes(searchTerm)
+    (client.fullName?.toLowerCase()?.includes(searchTerm.toLowerCase()) ?? false) ||
+    (client.phoneNumber?.includes(searchTerm) ?? false)
   );
 
   const filteredCompanyClients = companyClients.filter(client =>
-    (client.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    client.matriculeFiscal?.includes(searchTerm))
+    (client.companyName?.toLowerCase()?.includes(searchTerm.toLowerCase()) ?? false) ||
+    (client.matriculeFiscal?.includes(searchTerm) ?? false)
   );
 
   const handleSelectClient = (client: NormalClient | CompanyClient) => {
@@ -136,7 +140,7 @@ export default function ClientManagement() {
       if (activeTab === 'normal') {
         const client = selectedClient as NormalClient;
         await deleteNormalClient(client.phoneNumber);
-        setNormalClients(normalClients.filter(c => c.phoneNumber !== client.phoneNumber));
+        setNormalClients(normalClients.filter(c => c.id !== client.id));
         showNotification('Client deleted successfully', 'success');
       } else {
         const company = selectedClient as CompanyClient;
@@ -162,59 +166,45 @@ export default function ClientManagement() {
     
     try {
       if (activeTab === 'normal') {
-        const normalClientData = clientData as NormalClient;
+        const normalClientData = clientData as Omit<NormalClient, 'id'>;
         
         if (selectedClient) {
           // Update existing client
-          const apiData = mapNormalClientToApiData(normalClientData);
+          const apiData = mapNormalClientToApiData({ ...normalClientData, id: (selectedClient as NormalClient).id });
           await updateNormalClient(normalClientData.phoneNumber, apiData);
-          
-          // Update local state
           setNormalClients(prevClients => 
             prevClients.map(client =>
-              client.phoneNumber === normalClientData.phoneNumber ? normalClientData : client
+              client.phoneNumber === normalClientData.phoneNumber ? { ...normalClientData, id: (selectedClient as NormalClient).id } : client
             )
           );
-          
           showNotification('Client updated successfully', 'success');
         } else {
-          // Add new client will be handled in the form component
-          // Just update local state for now
-          setNormalClients(prevClients => [...prevClients, normalClientData]);
+          // Add new client
+          const apiData = mapNormalClientToApiData(normalClientData as NormalClient); // No id needed
+          const newClient = await createNormalClient(apiData); // Expect backend to return id
+          setNormalClients(prevClients => [...prevClients, mapApiDataToNormalClient(newClient)]);
           showNotification('Client created successfully', 'success');
         }
       } else {
-        const companyClientData = clientData as CompanyClient;
+        const companyClientData = clientData as Omit<CompanyClient, 'id'>;
         
         if (selectedClient) {
           // Update existing company
-          const apiData = mapCompanyClientToApiData(companyClientData);
+          const apiData = mapCompanyClientToApiData({ ...companyClientData, id: (selectedClient as CompanyClient).id });
           await updateCompanyClient(companyClientData.matriculeFiscal, apiData);
-          
-          // Update local state with functional update to ensure we're working with the latest state
-          setCompanyClients(prevCompanies => {
-            return prevCompanies.map(company => {
-              if (company.matriculeFiscal === (selectedClient as CompanyClient).matriculeFiscal) {
-                // Create a new object with the updated data and preserve the id
-                return { 
-                  ...companyClientData, 
-                  id: (selectedClient as CompanyClient).id 
-                } as CompanyClient;
-              }
-              return company;
-            });
-          });
-          
+          setCompanyClients(prevCompanies =>
+            prevCompanies.map(company =>
+              company.matriculeFiscal === (selectedClient as CompanyClient).matriculeFiscal
+                ? { ...companyClientData, id: (selectedClient as CompanyClient).id }
+                : company
+            )
+          );
           showNotification('Company updated successfully', 'success');
         } else {
-          // Add new company will be handled in the form component
-          // Just update local state with a temporary ID using functional update
-          const newCompany = { 
-            ...companyClientData, 
-            id: `temp-${Date.now()}` 
-          } as CompanyClient;
-          
-          setCompanyClients(prevCompanies => [...prevCompanies, newCompany]);
+          // Add new company
+          const apiData = mapCompanyClientToApiData(companyClientData as CompanyClient); // No id needed
+          const newCompany = await createCompanyClient(apiData); // Expect backend to return id
+          setCompanyClients(prevCompanies => [...prevCompanies, mapApiDataToCompanyClient(newCompany)]);
           showNotification('Company created successfully', 'success');
         }
       }
@@ -229,7 +219,6 @@ export default function ClientManagement() {
       setIsLoading(false);
     }
   };
-
   const handleFormCancel = () => {
     setShowForm(false);
     setIsEditing(false);

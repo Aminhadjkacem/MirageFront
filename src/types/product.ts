@@ -1,4 +1,6 @@
+// types/product.ts
 export interface Product {
+  id: number; // Add id field to match API response
   name: string;
   description: string;
   price: number;

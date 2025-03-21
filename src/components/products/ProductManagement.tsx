@@ -1,3 +1,4 @@
+// components/products/ProductManagement.tsx
 import { useState, useEffect } from 'react';
 import { Product, ProductFormData } from '../../types/product';
 import ProductHeader from './ProductHeader';
@@ -28,7 +29,7 @@ export default function ProductManagement() {
   const fetchProducts = async () => {
     try {
       const data = await productsApi.getAll();
-      setProducts(data);
+      setProducts(data || []);
       setError(null);
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -38,6 +39,7 @@ export default function ProductManagement() {
           ? 'Products endpoint not found. Check the server URL.'
           : 'Failed to load products. Please try again.'
       );
+      setProducts([]);
     }
   };
 
@@ -118,9 +120,9 @@ export default function ProductManagement() {
   };
 
   const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase())
+    (product.name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+    (product.description || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
+    (product.category || '').toLowerCase().includes((searchTerm || '').toLowerCase())
   );
 
   return (

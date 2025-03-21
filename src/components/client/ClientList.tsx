@@ -82,10 +82,10 @@ function NormalClientsList({ clients, selectedClient, onSelectClient }: NormalCl
     <>
       {clients.map(client => (
         <button
-          key={client.phoneNumber}
+          key={client.id}
           onClick={() => onSelectClient(client)}
           className={`w-full p-4 text-left rounded-lg border ${
-            selectedClient?.phoneNumber === client.phoneNumber
+            selectedClient?.id === client.id
               ? 'border-blue-500 bg-blue-50'
               : 'border-gray-200 hover:bg-gray-50'
           }`}
@@ -125,8 +125,8 @@ function CompanyClientsList({ clients, selectedClient, onSelectClient }: Company
             isSelected = client.id === selectedClient.id;
           }
           // If client has a matriculeFiscal, check if it matches the selected client's matriculeFiscal
-          else if (client.matriculeFiscal && selectedClient.matriculeFiscal) {
-            isSelected = client.matriculeFiscal === selectedClient.matriculeFiscal;
+          else if (client.id && selectedClient.matriculeFiscal) {
+            isSelected = client.id === selectedClient.id;
           }
           // If no id or matriculeFiscal, compare company names as a fallback
           else if (client.companyName && selectedClient.companyName) {
@@ -139,7 +139,7 @@ function CompanyClientsList({ clients, selectedClient, onSelectClient }: Company
         
         return (
           <button
-            key={client.matriculeFiscal}
+            key={client.id}
             onClick={() => onSelectClient(client)}
             className={`w-full p-4 text-left rounded-lg border ${
               isSelected

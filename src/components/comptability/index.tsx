@@ -1,6 +1,6 @@
 import { Routes, Route, Link, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { FileText, Receipt, Truck as TruckDelivery, ArrowLeft } from 'lucide-react';
-import Devis from './Devis';
+import Devis from './Quotation/Devis';
 
 export default function Comptability() {
   const location = useLocation();

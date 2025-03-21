@@ -1,33 +1,43 @@
+// api/products.ts
 import axios, { AxiosError } from 'axios';
 import { Product, ProductInput } from '../types/product';
 
-// Adjust this to your backend's actual URL
-const API_BASE_URL = 'https://localhost:7060/api'; // Double-check this!
+// Define the raw API response type
+interface RawProductResponse {
+  Id: number;
+  Name: string | null; // Allow null since we provide fallbacks
+  Description: string | null;
+  Price: number | null;
+  Stock: number | null;
+  Category: string | null;
+}
+
+const API_BASE_URL = 'https://localhost:7060/api';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
-  // For local dev with self-signed certificates (uncomment if needed)
-  // httpsAgent: new (require('https')).Agent({ rejectUnauthorized: false }),
 });
 
 const productsApi = {
   getAll: async (): Promise<Product[]> => {
     try {
-      console.log(`Fetching from: ${API_BASE_URL}/Product`); // Log the exact URL
       const response = await apiClient.get('/Product');
-      console.log('GET /Products response:', response.data);
-      return response.data;
+      console.log('GET /Product response:', response.data);
+      // Use RawProductResponse instead of any
+      return response.data.map((p: RawProductResponse) => ({
+        id: p.Id, // No fallback needed since Id is required
+        name: p.Name || '',
+        description: p.Description || '',
+        price: p.Price || 0,
+        stock: p.Stock || 0,
+        category: p.Category || '',
+      }));
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error('GET /Products error:', {
-        url: `${API_BASE_URL}/Products`,
-        message: axiosError.message,
-        response: axiosError.response?.data,
-        status: axiosError.response?.status,
-      });
+      console.error('GET /Product error:', axiosError);
       throw axiosError;
     }
   },
@@ -35,16 +45,18 @@ const productsApi = {
   getByName: async (name: string): Promise<Product> => {
     try {
       const response = await apiClient.get(`/Product/${name}`);
-      console.log(`GET /Products/${name} response:`, response.data);
-      return response.data;
+      const p = response.data as RawProductResponse; // Type the response
+      return {
+        id: p.Id,
+        name: p.Name || '',
+        description: p.Description || '',
+        price: p.Price || 0,
+        stock: p.Stock || 0,
+        category: p.Category || '',
+      };
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error(`GET /Product/${name} error:`, {
-        url: `${API_BASE_URL}/Products/${name}`,
-        message: axiosError.message,
-        response: axiosError.response?.data,
-        status: axiosError.response?.status,
-      });
+      console.error(`GET /Product/${name} error:`, axiosError);
       throw axiosError;
     }
   },
@@ -52,16 +64,18 @@ const productsApi = {
   create: async (product: ProductInput): Promise<Product> => {
     try {
       const response = await apiClient.post('/Product', product);
-      console.log('POST /Products response:', response.data);
-      return response.data;
+      const p = response.data as RawProductResponse;
+      return {
+        id: p.Id,
+        name: p.Name || '',
+        description: p.Description || '',
+        price: p.Price || 0,
+        stock: p.Stock || 0,
+        category: p.Category || '',
+      };
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error('POST /Products error:', {
-        url: `${API_BASE_URL}/Product`,
-        message: axiosError.message,
-        response: axiosError.response?.data,
-        status: axiosError.response?.status,
-      });
+      console.error('POST /Product error:', axiosError);
       throw axiosError;
     }
   },
@@ -69,16 +83,18 @@ const productsApi = {
   update: async (name: string, product: ProductInput): Promise<Product> => {
     try {
       const response = await apiClient.put(`/Product/${name}`, product);
-      console.log(`PUT /Product/${name} response:`, response.data);
-      return response.data;
+      const p = response.data as RawProductResponse;
+      return {
+        id: p.Id,
+        name: p.Name || '',
+        description: p.Description || '',
+        price: p.Price || 0,
+        stock: p.Stock || 0,
+        category: p.Category || '',
+      };
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error(`PUT /Product/${name} error:`, {
-        url: `${API_BASE_URL}/Product/${name}`,
-        message: axiosError.message,
-        response: axiosError.response?.data,
-        status: axiosError.response?.status,
-      });
+      console.error(`PUT /Product/${name} error:`, axiosError);
       throw axiosError;
     }
   },
@@ -89,12 +105,7 @@ const productsApi = {
       console.log(`DELETE /Product/${name} successful`);
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error(`DELETE /Product/${name} error:`, {
-        url: `${API_BASE_URL}/Product/${name}`,
-        message: axiosError.message,
-        response: axiosError.response?.data,
-        status: axiosError.response?.status,
-      });
+      console.error(`DELETE /Product/${name} error:`, axiosError);
       throw axiosError;
     }
   },

@@ -14,11 +14,12 @@ const axiosInstance = axios.create({
 
 // Define an interface for Client Data (based on expected structure)
 interface ClientData {
-  fullName: string;
-  phoneNumber: string;
-  address: string;
-  email: string;
-  cin: string;
+  Id?: number;
+  FullName: string;
+  PhoneNumber: string;
+  Address: string;
+  Email: string;
+  CIN: string;
 }
 
 // Function to get all normal clients
@@ -47,14 +48,15 @@ export const getNormalClientById = async (id: string): Promise<ClientData> => {
 // Function to create a new normal client
 export const createNormalClient = async (clientData: ClientData): Promise<ClientData> => {
   try {
-    const response = await axiosInstance.post('/NormalCustomer', clientData);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { Id: _, ...dataWithoutId } = clientData; // Rename Id to _ to indicate it's unused
+    const response = await axiosInstance.post('/NormalCustomer', dataWithoutId);
     return response.data;
   } catch (error) {
     console.error('Error creating normal client:', error);
     throw error;
   }
 };
-
 // Function to update an existing normal client
 export const updateNormalClient = async (phoneNumber: string, clientData: ClientData): Promise<ClientData> => {
   try {
@@ -79,21 +81,34 @@ export const deleteNormalClient = async (phoneNumber: string): Promise<void> => 
 // Helper function to map API data to our client interface
 export const mapApiDataToNormalClient = (apiData: ClientData): NormalClient => {
   return {
-    fullName: apiData.fullName,
-    phoneNumber: apiData.phoneNumber,
-    address: apiData.address,
-    email: apiData.email,
-    identityCardNumber: apiData.cin
+    id: apiData.Id,
+    fullName: apiData.FullName, // Ensure correct casing
+    phoneNumber: apiData.PhoneNumber,
+    address: apiData.Address,
+    email: apiData.Email,
+    identityCardNumber: apiData.CIN
   };
 };
+
 
 // Helper function to map our client interface to API data
 export const mapNormalClientToApiData = (client: NormalClient): ClientData => {
   return {
-    fullName: client.fullName,
-    phoneNumber: client.phoneNumber,
-    address: client.address,
-    email: client.email,
-    cin: client.identityCardNumber
+    Id: client.id, // client.id is number | undefined, but Id must be number
+    FullName: client.fullName,
+    PhoneNumber: client.phoneNumber,
+    Address: client.address,
+    Email: client.email,
+    CIN: client.identityCardNumber
+  };
+};
+export const mapApiDataToNormal = (apiData: ClientData): NormalClient => {
+  return {
+    id: apiData.Id,
+    fullName: apiData.FullName, // Fix casing
+    phoneNumber: apiData.PhoneNumber,
+    address: apiData.Address,
+    email: apiData.Email,
+    identityCardNumber: apiData.CIN // Ensure proper mapping
   };
 };
