@@ -63,7 +63,7 @@ const settingsApi = {
   // PUT droit-de-timbre (204 No Content)
   updateDroitDuTimbre: async (value: string): Promise<void> => {
     try {
-      const response = await axiosInstance.put('/Settings/droit-de-timbre', `"${value}"`);
+      const response = await axiosInstance.put('/Settings/droit-du-timbre', `"${value}"`);
       console.log(`PUT /Settings/droit-de-timbre with "${value}" succeeded with status: ${response.status} (No Content)`);
     } catch (error) {
       const axiosError = error as AxiosError;

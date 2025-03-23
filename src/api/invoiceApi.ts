@@ -38,6 +38,7 @@ interface RawQuotationResponse {
     }[];
   }[];
   TotalPrice: number;
+  TotalPriceHT: number;
   Status: QuotationStatus;
 }
 

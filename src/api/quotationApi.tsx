@@ -58,6 +58,7 @@ interface RawQuotationResponse {
   CustomerDetails: CustomerDetails | string | null;
   Designations: Designation[];
   TotalPrice: number;
+  TotalPriceHT:number;
   Status: QuotationStatus;
 }
 
@@ -86,6 +87,7 @@ export interface Quotation {
   CreatedAt: string;
   Designations: Designation[];
   TotalPrice: number;
+  TotalPriceHT: number;
   Status: QuotationStatus;
 }
 
@@ -107,6 +109,7 @@ export const createQuotation = async (quotation: QuotationRequest): Promise<Quot
       CreatedAt: raw.CreatedAt,
       Designations: raw.Designations,
       TotalPrice: raw.TotalPrice,
+      TotalPriceHT:raw.TotalPriceHT,
       Status: raw.Status,
     };
   } catch (error) {
@@ -188,6 +191,7 @@ export const getAllQuotations = async (): Promise<Quotation[]> => {
           })),
         })),
         TotalPrice: raw.TotalPrice,
+        TotalPriceHT:raw.TotalPriceHT,
         Status: raw.Status,
       };
     });
