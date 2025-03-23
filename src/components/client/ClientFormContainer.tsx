@@ -15,12 +15,12 @@ export default function ClientFormContainer({
   isEditing,
   selectedClient,
   onSubmit,
-  onCancel
+  onCancel,
 }: ClientFormContainerProps) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
+    <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
       <h3 className="text-xl font-semibold text-gray-900 mb-6">
-        {isEditing ? 'Edit' : 'Add New'} {activeTab === 'normal' ? 'Client' : 'Company'}
+        {isEditing ? 'Edit' : 'Add New'} {activeTab === 'normal' ? 'Individual Client' : 'Company Client'}
       </h3>
       {activeTab === 'normal' ? (
         <NormalClientForm

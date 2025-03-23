@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { Users, Truck, User, LogOut, ChevronDown, Calculator, Users2, Package } from 'lucide-react';
+import { Users, Truck, User, LogOut, ChevronDown, Calculator, Users2, Package, Settings } from 'lucide-react';
 import type { UserType } from '../../App';
 
 type DashboardProps = {
@@ -23,7 +23,10 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
 
           {/* Profile Menu */}
           <div className="relative">
-            <button onClick={() => setShowProfileMenu(!showProfileMenu)} className="flex items-center space-x-3 focus:outline-none">
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              className="flex items-center space-x-3 focus:outline-none"
+            >
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
                 <User className="h-6 w-6 text-white" />
               </div>
@@ -33,7 +36,10 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
 
             {showProfileMenu && (
               <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                <button onClick={onLogout} className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2">
+                <button
+                  onClick={onLogout}
+                  className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
+                >
                   <LogOut className="h-4 w-4" />
                   <span>Sign out</span>
                 </button>
@@ -47,7 +53,10 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Clients Button */}
-          <Link to="/clients" className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4">
+          <Link
+            to="/clients"
+            className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4"
+          >
             <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
               <Users className="h-8 w-8 text-blue-600" />
             </div>
@@ -55,7 +64,10 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           </Link>
 
           {/* Products Button */}
-          <Link to="/products" className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4">
+          <Link
+            to="/products"
+            className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4"
+          >
             <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
               <Package className="h-8 w-8 text-indigo-600" />
             </div>
@@ -71,7 +83,10 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           </button>
 
           {/* Comptabilité Button */}
-          <Link to="/comptability" className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4">
+          <Link
+            to="/comptability"
+            className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4"
+          >
             <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
               <Calculator className="h-8 w-8 text-red-600" />
             </div>
@@ -85,6 +100,17 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             </div>
             <span className="text-lg font-medium text-gray-900">RH</span>
           </button>
+
+          {/* Settings Button */}
+          <Link
+            to="/settings"
+            className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4"
+          >
+            <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center">
+              <Settings className="h-8 w-8 text-purple-600" />
+            </div>
+            <span className="text-lg font-medium text-gray-900">Settings</span>
+          </Link>
         </div>
       </main>
     </div>

@@ -20,11 +20,11 @@ export default function ClientList({
   companyClients,
   selectedClient,
   onSelectClient,
-  isLoading
+  isLoading,
 }: ClientListProps) {
   return (
-    <>
-      <div className="mb-4">
+    <div className="h-full flex flex-col">
+      <div className="mb-4 flex-shrink-0">
         <div className="relative">
           <input
             type="text"
@@ -39,11 +39,11 @@ export default function ClientList({
 
       {isLoading && ((activeTab === 'normal' && normalClients.length === 0) || 
                      (activeTab === 'company' && companyClients.length === 0)) ? (
-        <div className="flex justify-center py-8">
+        <div className="flex justify-center py-8 flex-grow">
           <div className="animate-pulse text-gray-500">Loading {activeTab === 'normal' ? 'clients' : 'companies'}...</div>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="flex-grow overflow-y-auto max-h-[calc(100vh-16rem)]"> {/* Scrollable container */}
           {activeTab === 'normal' ? (
             <NormalClientsList 
               clients={normalClients} 
@@ -59,7 +59,7 @@ export default function ClientList({
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }
 
@@ -79,7 +79,7 @@ function NormalClientsList({ clients, selectedClient, onSelectClient }: NormalCl
   }
 
   return (
-    <>
+    <div className="space-y-2">
       {clients.map(client => (
         <button
           key={client.id}
@@ -94,7 +94,7 @@ function NormalClientsList({ clients, selectedClient, onSelectClient }: NormalCl
           <p className="text-sm text-gray-500">{client.phoneNumber}</p>
         </button>
       ))}
-    </>
+    </div>
   );
 }
 
@@ -114,32 +114,12 @@ function CompanyClientsList({ clients, selectedClient, onSelectClient }: Company
   }
 
   return (
-    <>
+    <div className="space-y-2">
       {clients.map(client => {
-        // Check if this client is selected by comparing relevant properties
-        let isSelected = false;
-        
-        if (selectedClient) {
-          // If client has an id, check if it matches the selected client's id
-          if (client.id && selectedClient.id) {
-            isSelected = client.id === selectedClient.id;
-          }
-          // If client has a matriculeFiscal, check if it matches the selected client's matriculeFiscal
-          else if (client.id && selectedClient.matriculeFiscal) {
-            isSelected = client.id === selectedClient.id;
-          }
-          // If no id or matriculeFiscal, compare company names as a fallback
-          else if (client.companyName && selectedClient.companyName) {
-            isSelected = client.companyName === selectedClient.companyName;
-          }
-        }
-        
-        // Use a more reliable key that combines multiple unique identifiers
-        // This is important for React to correctly identify each item in the list
-        
+        const isSelected = selectedClient?.id === client.id;
         return (
           <button
-            key={client.id}
+            key={client.id || client.matriculeFiscal} // Fallback to matriculeFiscal if id is undefined
             onClick={() => onSelectClient(client)}
             className={`w-full p-4 text-left rounded-lg border ${
               isSelected
@@ -156,6 +136,6 @@ function CompanyClientsList({ clients, selectedClient, onSelectClient }: Company
           </button>
         );
       })}
-    </>
+    </div>
   );
 }

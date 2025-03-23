@@ -1,7 +1,7 @@
 // src/components/comptability/QuotationSearchFilter.tsx
-import { useState, useMemo } from 'react';
-import { Quotation } from '../../../api/quotationApi';
-import { useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { Quotation, QuotationStatus } from '../../../api/quotationApi';
+
 interface QuotationSearchFilterProps {
   devis: Quotation[];
   onFilterChange: (filteredDevis: Quotation[]) => void;
@@ -11,15 +11,18 @@ export function QuotationSearchFilter({ devis, onFilterChange }: QuotationSearch
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProject, setSelectedProject] = useState<string>('');
 
-  // Get unique project names for the filter dropdown
+  // Filter only pending quotations and get unique project names
   const projectOptions = useMemo(() => {
-    const projects = Array.from(new Set(devis.map(item => item.ProjectName)));
+    // Filter devis to include only those with "PENDING" status
+    const pendingDevis = devis.filter(item => item.Status === QuotationStatus.PENDING);
+    const projects = Array.from(new Set(pendingDevis.map(item => item.ProjectName)));
     return ['All Projects', ...projects]; // Include "All Projects" as the default/reset option
   }, [devis]);
 
-  // Handle search and filter logic
+  // Handle search and filter logic, starting with only pending quotations
   const filteredDevis = useMemo(() => {
-    let result = [...devis];
+    // Start with only pending quotations
+    let result = devis.filter(item => item.Status === QuotationStatus.PENDING);
 
     // Search by client name, project name, or designation
     if (searchQuery.trim()) {

@@ -1,4 +1,3 @@
-// api/quotationApi.ts
 import axios, { AxiosError } from 'axios';
 
 const API_BASE_URL = 'https://localhost:7060/api';
@@ -9,6 +8,13 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Define possible status values as an enum
+export enum QuotationStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'VALIDATED',
+  // Add more statuses as needed
+}
 
 export interface QuotationProduct {
   ProductId: number;
@@ -42,9 +48,22 @@ export interface CustomerDetails {
   Email?: string;
   CIN?: string;
   MatriculeFiscal?: string;
-  [key: string]: unknown;
+  [key: string]: unknown; // Allow extra fields
 }
 
+// Raw response type from the API
+interface RawQuotationResponse {
+  Id: number;
+  ProjectName: string;
+  CreatedAt: string;
+  CustomerType: 'NORMAL' | 'COMPANY';
+  CustomerDetails: CustomerDetails | string | null; // Updated to handle null
+  Designations: Designation[];
+  TotalPrice: number;
+  Status: QuotationStatus;
+}
+
+// Request interface for creating a quotation (no Status)
 export interface QuotationRequest {
   Id?: number;
   ProjectName: string;
@@ -53,39 +72,48 @@ export interface QuotationRequest {
   Designations: DesignationRequest[];
 }
 
+// Request interface for updating a quotation
 export interface QuotationUpdateRequest {
   Id: number;
   ProjectName: string;
   Designations: DesignationUpdateRequest[];
+  CustomerType: 'NORMAL' | 'COMPANY'; // Added
+  CustomerId: number;                  // Added
 }
 
+// Response interface includes Status
 export interface Quotation {
   Id: number;
   ProjectName: string;
   CustomerType: 'NORMAL' | 'COMPANY';
   CustomerId: number;
   CustomerDetails: CustomerDetails;
-  CreatedAt: string;
+  CreatedAt: string; // ISO date string
   Designations: Designation[];
+  TotalPrice: number;
+  Status: QuotationStatus;
 }
-
-export const getAllQuotations = async (): Promise<Quotation[]> => {
-  try {
-    const response = await apiClient.get('/Quotations');
-    console.log('GET /Quotations response:', response.data);
-    return response.data;
-  } catch (error) {
-    const axiosError = error as AxiosError;
-    console.error('Error fetching quotations:', axiosError);
-    throw axiosError;
-  }
-};
 
 export const createQuotation = async (quotation: QuotationRequest): Promise<Quotation> => {
   try {
     console.log('Sending create quotation request:', JSON.stringify(quotation, null, 2));
     const response = await apiClient.post('/Quotations', quotation);
-    return response.data;
+    const raw = response.data as RawQuotationResponse;
+    return {
+      Id: raw.Id,
+      ProjectName: raw.ProjectName,
+      CustomerType: raw.CustomerType,
+      CustomerId: typeof raw.CustomerDetails === 'string' || raw.CustomerDetails === null ? 0 : raw.CustomerDetails.id,
+      CustomerDetails: typeof raw.CustomerDetails === 'string'
+        ? { id: 0, FullName: raw.CustomerDetails }
+        : raw.CustomerDetails === null
+        ? { id: 0, FullName: 'Unknown Client' }
+        : raw.CustomerDetails,
+      CreatedAt: raw.CreatedAt,
+      Designations: raw.Designations,
+      TotalPrice: raw.TotalPrice,
+      Status: raw.Status,
+    };
   } catch (error) {
     const axiosError = error as AxiosError;
     console.error('Error creating quotation:', axiosError);
@@ -93,14 +121,34 @@ export const createQuotation = async (quotation: QuotationRequest): Promise<Quot
   }
 };
 
-export const updateQuotation = async (id: number, quotation: QuotationUpdateRequest): Promise<Quotation> => {
+export const updateQuotation = async (id: number, quotation: QuotationUpdateRequest): Promise<void> => {
   try {
-    console.log('Sending update quotation request:', JSON.stringify(quotation, null, 2));
-    const response = await apiClient.put(`/Quotations/${id}`, quotation);
-    return response.data;
+    const payload: QuotationUpdateRequest = {
+      Id: id,
+      ProjectName: quotation.ProjectName,
+      Designations: quotation.Designations.map(d => ({
+        Id: d.Id || 0,
+        Name: d.Name,
+        Products: d.Products.map(p => ({
+          ProductId: p.ProductId,
+          Quantity: p.Quantity,
+        })),
+      })),
+      CustomerType: quotation.CustomerType,
+      CustomerId: quotation.CustomerId,
+    };
+
+    console.log('Sending update quotation request:', JSON.stringify(payload, null, 2));
+    const response = await apiClient.put('/Quotations', payload);
+
+    if (response.status === 204) {
+      return;
+    } else {
+      throw new Error(`Unexpected status code: ${response.status}`);
+    }
   } catch (error) {
     const axiosError = error as AxiosError;
-    console.error('Error updating quotation:', axiosError);
+    console.error('Error updating quotation:', axiosError.response?.data || axiosError.message);
     throw axiosError;
   }
 };
@@ -111,6 +159,46 @@ export const deleteQuotation = async (id: number): Promise<void> => {
   } catch (error) {
     const axiosError = error as AxiosError;
     console.error('Error deleting quotation:', axiosError);
+    throw axiosError;
+  }
+};
+
+// Assuming getAllQuotations is elsewhere, but should be here for consistency
+export const getAllQuotations = async (): Promise<Quotation[]> => {
+  try {
+    const response = await apiClient.get('/Quotations');
+    console.log('GET /Quotations response:', response.data);
+    return response.data.map((raw: RawQuotationResponse) => {
+      const isCustomerDetailsString = typeof raw.CustomerDetails === 'string';
+      const isCustomerDetailsNull = raw.CustomerDetails === null || raw.CustomerDetails === undefined;
+
+      return {
+        Id: raw.Id,
+        ProjectName: raw.ProjectName,
+        CustomerType: raw.CustomerType,
+        CustomerId: isCustomerDetailsString || isCustomerDetailsNull ? 0 : (raw.CustomerDetails as CustomerDetails).id,
+        CustomerDetails: isCustomerDetailsString
+          ? { id: 0, FullName: raw.CustomerDetails as string }
+          : isCustomerDetailsNull
+          ? { id: 0, FullName: 'Unknown Client' }
+          : raw.CustomerDetails as CustomerDetails,
+        CreatedAt: raw.CreatedAt,
+        Designations: raw.Designations.map(d => ({
+          Id: d.Id,
+          Name: d.Name,
+          Products: d.Products.map(p => ({
+            ProductId: p.ProductId,
+            ProductName: p.ProductName || '',
+            Quantity: p.Quantity,
+          })),
+        })),
+        TotalPrice: raw.TotalPrice,
+        Status: raw.Status,
+      };
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    console.error('Error fetching quotations:', axiosError);
     throw axiosError;
   }
 };

@@ -4,7 +4,7 @@ import { Product } from '../../types/product';
 interface ProductCardProps {
   product: Product;
   onEdit: (product: Product) => void;
-  onDelete: (name: string) => void;
+  onDelete: (id: number) => void; // Change to id: number
 }
 
 export default function ProductCard({ product, onEdit, onDelete }: ProductCardProps) {
@@ -16,7 +16,7 @@ export default function ProductCard({ product, onEdit, onDelete }: ProductCardPr
           <button onClick={() => onEdit(product)} className="text-gray-400 hover:text-blue-600">
             <Pencil className="h-5 w-5" />
           </button>
-          <button onClick={() => onDelete(product.name)} className="text-gray-400 hover:text-red-600">
+          <button onClick={() => onDelete(product.id)} className="text-gray-400 hover:text-red-600">
             <Trash2 className="h-5 w-5" />
           </button>
         </div>

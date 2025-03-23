@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import type { NormalClient, CompanyClient } from '../../types/client';
 import ClientList from './ClientList';
 import ClientDetails from './ClientDetails';
@@ -16,6 +17,7 @@ import {
   deleteNormalClient,
   mapApiDataToNormalClient,
   mapNormalClientToApiData,
+  ClientData, // Import ClientData
 } from '../../api/clientApi';
 import {
   getCompanyClients,
@@ -24,8 +26,8 @@ import {
   createCompanyClient,
   mapApiDataToCompanyClient,
   mapCompanyClientToApiData,
+  CompanyApiData, // Import CompanyApiData
 } from '../../api/companyApi';
-
 
 export default function ClientManagement() {
   const [activeTab, setActiveTab] = useState<'normal' | 'company'>('normal');
@@ -38,12 +40,10 @@ export default function ClientManagement() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [notification, setNotification] = useState<{message: string, type: 'success' | 'error'} | null>(null);
+  const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
   
-  // Ref for the details container to detect clicks outside
   const detailsContainerRef = useRef<HTMLDivElement>(null);
 
-  // Fetch clients on component mount or tab change
   useEffect(() => {
     const fetchClients = async () => {
       setIsLoading(true);
@@ -51,17 +51,13 @@ export default function ClientManagement() {
       try {
         if (activeTab === 'normal') {
           const apiClients = await getNormalClients();
-          const mappedClients = apiClients.map(client => {
-            const mapped = mapApiDataToNormalClient(client);
-            console.log('Mapped client:', mapped); // Log each mapped client
-            return mapped;
-          });
+          const mappedClients = apiClients.map(client => mapApiDataToNormalClient(client));
           setNormalClients(mappedClients);
         } else {
           const apiCompanies = await getCompanyClients();
           const mappedCompanies = apiCompanies.map(company => mapApiDataToCompanyClient(company));
-        setCompanyClients(mappedCompanies);
-        console.log('Company clients set:', mappedCompanies); // Verify data
+          setCompanyClients(mappedCompanies);
+          console.log('Company clients set:', mappedCompanies);
         }
       } catch (err) {
         setError(`Failed to fetch ${activeTab === 'normal' ? 'clients' : 'companies'}. Please try again later.`);
@@ -76,7 +72,6 @@ export default function ClientManagement() {
     setIsEditing(false);
   }, [activeTab]);
 
-  // Handle clicks outside the details container
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -89,16 +84,11 @@ export default function ClientManagement() {
         setSelectedClient(null);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [selectedClient, showForm, showDeleteConfirm]);
 
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-  };
+  const handleSearch = (term: string) => setSearchTerm(term);
 
   const filteredNormalClients = normalClients.filter(client =>
     (client.fullName?.toLowerCase()?.includes(searchTerm.toLowerCase()) ?? false) ||
@@ -126,16 +116,12 @@ export default function ClientManagement() {
     setShowForm(true);
   };
 
-  const handleDeleteConfirm = () => {
-    setShowDeleteConfirm(true);
-  };
+  const handleDeleteConfirm = () => setShowDeleteConfirm(true);
 
   const handleDelete = async () => {
     if (!selectedClient) return;
-    
     setIsLoading(true);
     setError(null);
-    
     try {
       if (activeTab === 'normal') {
         const client = selectedClient as NormalClient;
@@ -144,7 +130,6 @@ export default function ClientManagement() {
         showNotification('Client deleted successfully', 'success');
       } else {
         const company = selectedClient as CompanyClient;
-        // For company clients, we use the id for deletion according to the API
         await deleteCompanyClient(company.matriculeFiscal || '');
         setCompanyClients(companyClients.filter(c => c.id !== company.id));
         showNotification('Company deleted successfully', 'success');
@@ -161,15 +146,14 @@ export default function ClientManagement() {
   };
 
   const handleFormSubmit = async (clientData: Omit<NormalClient | CompanyClient, 'id'>) => {
+    if (isLoading) return;
     setIsLoading(true);
     setError(null);
     
     try {
       if (activeTab === 'normal') {
         const normalClientData = clientData as Omit<NormalClient, 'id'>;
-        
         if (selectedClient) {
-          // Update existing client
           const apiData = mapNormalClientToApiData({ ...normalClientData, id: (selectedClient as NormalClient).id });
           await updateNormalClient(normalClientData.phoneNumber, apiData);
           setNormalClients(prevClients => 
@@ -179,17 +163,16 @@ export default function ClientManagement() {
           );
           showNotification('Client updated successfully', 'success');
         } else {
-          // Add new client
-          const apiData = mapNormalClientToApiData(normalClientData as NormalClient); // No id needed
-          const newClient = await createNormalClient(apiData); // Expect backend to return id
+          const apiData = mapNormalClientToApiData(normalClientData as NormalClient);
+          console.log('Submitting new normal client:', apiData);
+          const newClient = await createNormalClient(apiData);
+          console.log('New client returned:', newClient);
           setNormalClients(prevClients => [...prevClients, mapApiDataToNormalClient(newClient)]);
           showNotification('Client created successfully', 'success');
         }
       } else {
         const companyClientData = clientData as Omit<CompanyClient, 'id'>;
-        
         if (selectedClient) {
-          // Update existing company
           const apiData = mapCompanyClientToApiData({ ...companyClientData, id: (selectedClient as CompanyClient).id });
           await updateCompanyClient(companyClientData.matriculeFiscal, apiData);
           setCompanyClients(prevCompanies =>
@@ -201,24 +184,53 @@ export default function ClientManagement() {
           );
           showNotification('Company updated successfully', 'success');
         } else {
-          // Add new company
-          const apiData = mapCompanyClientToApiData(companyClientData as CompanyClient); // No id needed
-          const newCompany = await createCompanyClient(apiData); // Expect backend to return id
+          const apiData = mapCompanyClientToApiData(companyClientData as CompanyClient);
+          console.log('Submitting new company:', apiData);
+          const newCompany = await createCompanyClient(apiData);
+          console.log('New company returned:', newCompany);
           setCompanyClients(prevCompanies => [...prevCompanies, mapApiDataToCompanyClient(newCompany)]);
           showNotification('Company created successfully', 'success');
         }
       }
-      
       setShowForm(false);
       setSelectedClient(null);
-    } catch (err) {
+    } catch (err: unknown) {
+      console.error('Form submission error:', err);
+      if (axios.isAxiosError(err) && err.response?.status === 500) {
+        const responseData = err.response.data;
+        if (typeof responseData === 'object' && responseData !== null && 'Id' in responseData) {
+          console.log('Using 500 response data:', responseData);
+          if (activeTab === 'normal') {
+            setNormalClients(prevClients => {
+              const alreadyExists = prevClients.some(client => client.id === responseData.Id);
+              if (!alreadyExists) {
+                return [...prevClients, mapApiDataToNormalClient(responseData as ClientData)];
+              }
+              return prevClients;
+            });
+            showNotification('Client created successfully', 'success');
+          } else {
+            setCompanyClients(prevCompanies => {
+              const alreadyExists = prevCompanies.some(company => company.id === responseData.Id);
+              if (!alreadyExists) {
+                return [...prevCompanies, mapApiDataToCompanyClient(responseData as CompanyApiData)];
+              }
+              return prevCompanies;
+            });
+            showNotification('Company created successfully', 'success');
+          }
+          setShowForm(false);
+          setSelectedClient(null);
+          return;
+        }
+      }
       setError(`Failed to save ${activeTab === 'normal' ? 'client' : 'company'}. Please try again.`);
       showNotification(`Failed to save ${activeTab === 'normal' ? 'client' : 'company'}`, 'error');
-      console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
+
   const handleFormCancel = () => {
     setShowForm(false);
     setIsEditing(false);
@@ -226,9 +238,7 @@ export default function ClientManagement() {
 
   const showNotification = (message: string, type: 'success' | 'error') => {
     setNotification({ message, type });
-    setTimeout(() => {
-      setNotification(null);
-    }, 3000);
+    setTimeout(() => setNotification(null), 3000);
   };
 
   return (
@@ -241,12 +251,9 @@ export default function ClientManagement() {
           isLoading={isLoading} 
         />
         <ErrorMessage error={error} />
-
         <div className="bg-white rounded-xl shadow-sm">
           <ClientTabs activeTab={activeTab} onTabChange={setActiveTab} />
-
           <div className="grid grid-cols-12 gap-6 p-6">
-            {/* Left side - Client List */}
             <div className="col-span-5">
               <ClientList 
                 activeTab={activeTab}
@@ -259,8 +266,6 @@ export default function ClientManagement() {
                 isLoading={isLoading}
               />
             </div>
-
-            {/* Right side - Client Details/Form */}
             <div className="col-span-7" ref={detailsContainerRef}>
               {showForm ? (
                 <ClientFormContainer
@@ -270,28 +275,24 @@ export default function ClientManagement() {
                   onSubmit={handleFormSubmit}
                   onCancel={handleFormCancel}
                 />
+              ) : selectedClient ? (
+                <ClientDetails
+                  activeTab={activeTab}
+                  selectedClient={selectedClient}
+                  onEdit={handleEdit}
+                  onDelete={handleDeleteConfirm}
+                  isLoading={isLoading}
+                />
               ) : (
-                selectedClient ? (
-                  <ClientDetails
-                    activeTab={activeTab}
-                    selectedClient={selectedClient}
-                    onEdit={handleEdit}
-                    onDelete={handleDeleteConfirm}
-                    isLoading={isLoading}
-                  />
-                ) : (
-                  <EmptyClientState 
-                    activeTab={activeTab} 
-                    onAddNew={handleAddNew} 
-                  />
-                )
+                <EmptyClientState 
+                  activeTab={activeTab} 
+                  onAddNew={handleAddNew} 
+                />
               )}
             </div>
           </div>
         </div>
       </div>
-
-      {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <DeleteConfirmationModal
           activeTab={activeTab}

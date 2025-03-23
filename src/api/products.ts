@@ -1,11 +1,9 @@
-// api/products.ts
 import axios, { AxiosError } from 'axios';
 import { Product, ProductInput } from '../types/product';
 
-// Define the raw API response type
 interface RawProductResponse {
   Id: number;
-  Name: string | null; // Allow null since we provide fallbacks
+  Name: string | null;
   Description: string | null;
   Price: number | null;
   Stock: number | null;
@@ -25,10 +23,10 @@ const productsApi = {
   getAll: async (): Promise<Product[]> => {
     try {
       const response = await apiClient.get('/Product');
-      console.log('GET /Product response:', response.data);
-      // Use RawProductResponse instead of any
-      return response.data.map((p: RawProductResponse) => ({
-        id: p.Id, // No fallback needed since Id is required
+      console.log('GET /Product response:', response.status, response.data);
+      const data = response.data || [];
+      return data.map((p: RawProductResponse) => ({
+        id: p.Id,
         name: p.Name || '',
         description: p.Description || '',
         price: p.Price || 0,
@@ -37,7 +35,11 @@ const productsApi = {
       }));
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error('GET /Product error:', axiosError);
+      console.error('GET /Product error:', axiosError.response?.status, axiosError.message);
+      if (axiosError.response?.status === 400) {
+        console.log('Treating 400 as empty product list');
+        return [];
+      }
       throw axiosError;
     }
   },
@@ -45,7 +47,7 @@ const productsApi = {
   getByName: async (name: string): Promise<Product> => {
     try {
       const response = await apiClient.get(`/Product/${name}`);
-      const p = response.data as RawProductResponse; // Type the response
+      const p = response.data as RawProductResponse;
       return {
         id: p.Id,
         name: p.Name || '',
@@ -64,6 +66,7 @@ const productsApi = {
   create: async (product: ProductInput): Promise<Product> => {
     try {
       const response = await apiClient.post('/Product', product);
+      console.log('POST /Product response:', response.data);
       const p = response.data as RawProductResponse;
       return {
         id: p.Id,
@@ -80,32 +83,36 @@ const productsApi = {
     }
   },
 
-  update: async (name: string, product: ProductInput): Promise<Product> => {
+  patch: async (id: number, product: ProductInput): Promise<Product> => {
     try {
-      const response = await apiClient.put(`/Product/${name}`, product);
-      const p = response.data as RawProductResponse;
+      const patchUrl = `/Product/${id}`;
+      const patchResponse = await apiClient.patch(patchUrl, product);
+      const rawProduct = patchResponse.data as RawProductResponse;
+  
+      console.log(`PATCH ${patchUrl} successful, status: ${patchResponse.status}`);
+  
       return {
-        id: p.Id,
-        name: p.Name || '',
-        description: p.Description || '',
-        price: p.Price || 0,
-        stock: p.Stock || 0,
-        category: p.Category || '',
+        id: rawProduct.Id,
+        name: rawProduct.Name || '',
+        description: rawProduct.Description || '',
+        price: rawProduct.Price || 0,
+        stock: rawProduct.Stock || 0,
+        category: rawProduct.Category || '',
       };
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error(`PUT /Product/${name} error:`, axiosError);
+      console.error(`PATCH /Product/${id} error:`, axiosError);
       throw axiosError;
     }
   },
 
-  delete: async (name: string): Promise<void> => {
+  delete: async (id: number): Promise<void> => {
     try {
-      await apiClient.delete(`/Product/${name}`);
-      console.log(`DELETE /Product/${name} successful`);
+      await apiClient.delete(`/Product/${id}`);
+      console.log(`DELETE /Product/${id} successful`);
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error(`DELETE /Product/${name} error:`, axiosError);
+      console.error(`DELETE /Product/${id} error:`, axiosError);
       throw axiosError;
     }
   },

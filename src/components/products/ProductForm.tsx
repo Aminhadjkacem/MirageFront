@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, Save } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { X, CheckCircle, Loader2 } from 'lucide-react';
 import { ProductFormData } from '../../types/product';
 
 interface ProductFormProps {
@@ -19,91 +19,189 @@ export default function ProductForm({
   isEditing,
   onSubmit,
 }: ProductFormProps) {
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [errors, setErrors] = React.useState<Partial<ProductFormData>>({});
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus name field when modal opens
+  useEffect(() => {
+    if (isOpen && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  // Close modal with Escape key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isSubmitting) onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isSubmitting, onClose]);
+
+  const validateForm = () => {
+    const newErrors: Partial<ProductFormData> = {};
+    if (!formData.name.trim()) newErrors.name = 'Name is required';
+    if (!formData.description.trim()) newErrors.description = 'Description is required';
+    if (!formData.price || parseFloat(formData.price) < 0) newErrors.price = 'Price must be 0 or greater';
+    if (!formData.stock || parseInt(formData.stock) < 0) newErrors.stock = 'Stock must be 0 or greater';
+    if (!formData.category.trim()) newErrors.category = 'Category is required';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    setIsSubmitting(true);
+    try {
+      await onSubmit(e);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold">{isEditing ? 'Edit Product' : 'Add New Product'}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded-lg shadow-md w-full max-w-md space-y-6"
+      >
+        {/* Header */}
+        <div className="flex justify-between items-center border-b pb-4">
+          <h3 className="text-lg font-semibold text-gray-800">
+            {isEditing ? 'Edit Product' : 'Add New Product'}
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-600 hover:text-gray-800 transition-colors disabled:opacity-50"
+            disabled={isSubmitting}
+            aria-label="Close"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
-        <form onSubmit={onSubmit} className="space-y-4">
+
+        {/* Form Fields */}
+        <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700">Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Name <span className="text-red-500">*</span>
+            </label>
             <input
+              ref={nameInputRef}
               type="text"
-              required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 ${
+                errors.name ? 'border-red-300' : ''
+              }`}
+              placeholder="e.g., iPhone 14"
+              disabled={isSubmitting}
             />
+            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description <span className="text-red-500">*</span>
+            </label>
             <textarea
-              required
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 ${
+                errors.description ? 'border-red-300' : ''
+              }`}
+              placeholder="e.g., Latest smartphone with advanced features"
               rows={3}
+              disabled={isSubmitting}
             />
+            {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
           </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Price (TND)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Price (TND) <span className="text-red-500">*</span>
+              </label>
               <input
                 type="number"
-                required
                 min="0"
                 step="0.01"
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 ${
+                  errors.price ? 'border-red-300' : ''
+                }`}
+                placeholder="e.g., 999.99"
+                disabled={isSubmitting}
               />
+              {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Stock</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Stock <span className="text-red-500">*</span>
+              </label>
               <input
                 type="number"
-                required
                 min="0"
                 value={formData.stock}
                 onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 ${
+                  errors.stock ? 'border-red-300' : ''
+                }`}
+                placeholder="e.g., 50"
+                disabled={isSubmitting}
               />
+              {errors.stock && <p className="mt-1 text-sm text-red-600">{errors.stock}</p>}
             </div>
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700">Category</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Category <span className="text-red-500">*</span>
+            </label>
             <input
               type="text"
-              required
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 ${
+                errors.category ? 'border-red-300' : ''
+              }`}
+              placeholder="e.g., Electronics"
+              disabled={isSubmitting}
             />
+            {errors.category && <p className="mt-1 text-sm text-red-600">{errors.category}</p>}
           </div>
-          <div className="flex justify-end space-x-3 mt-6">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              <Save className="h-4 w-4 mr-2" />
-              {isEditing ? 'Update' : 'Save'}
-            </button>
-          </div>
-        </form>
-      </div>
+        </div>
+
+        {/* Form Actions */}
+        <div className="flex justify-end space-x-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors disabled:opacity-50"
+            disabled={isSubmitting}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors flex items-center disabled:opacity-50"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <CheckCircle className="h-4 w-4 mr-2" />
+            )}
+            {isSubmitting ? 'Saving...' : isEditing ? 'Update' : 'Save'}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

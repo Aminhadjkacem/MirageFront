@@ -3,8 +3,17 @@ import { QuotationModal } from './QuotationModal';
 import { DevisHeader } from './DevisHeader';
 import { QuotationForm } from './QuotationForm';
 import { QuotationTable } from './QuotationTable';
-import { QuotationSearchFilter } from './QuotationSearchFilter'; // Add new component
-import { createQuotation, deleteQuotation, updateQuotation, getAllQuotations, Quotation, QuotationRequest, QuotationUpdateRequest } from '../../../api/quotationApi';
+import { QuotationSearchFilter } from './QuotationSearchFilter';
+import {
+  createQuotation,
+  deleteQuotation,
+  updateQuotation,
+  getAllQuotations,
+  Quotation,
+  QuotationRequest,
+  QuotationUpdateRequest,
+  CustomerDetails,
+} from '../../../api/quotationApi';
 import productsApi from '../../../api/products';
 import { getNormalClients, mapApiDataToNormal } from '../../../api/clientApi';
 import { getCompanyClients, mapApiDataToCompanyClient } from '../../../api/companyApi';
@@ -13,7 +22,7 @@ import { Product } from '../../../types/product';
 
 export default function Devis() {
   const [devis, setDevis] = useState<Quotation[]>([]);
-  const [filteredDevis, setFilteredDevis] = useState<Quotation[]>([]); // Add filtered state
+  const [filteredDevis, setFilteredDevis] = useState<Quotation[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [normalClients, setNormalClients] = useState<NormalClient[]>([]);
   const [companyClients, setCompanyClients] = useState<CompanyClient[]>([]);
@@ -21,32 +30,51 @@ export default function Devis() {
   const [selectedQuotation, setSelectedQuotation] = useState<{ item: Quotation; editMode: boolean } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const [productList, normalClientsList, companyClientsList] = await Promise.all([
+        productsApi.getAll(),
+        getNormalClients(),
+        getCompanyClients(),
+      ]);
+
+      const mappedNormalClients = normalClientsList.map(mapApiDataToNormal);
+      const mappedCompanyClients = companyClientsList.map(mapApiDataToCompanyClient);
+
+      setProducts(productList || []);
+      setNormalClients(mappedNormalClients || []);
+      setCompanyClients(mappedCompanyClients || []);
+
+      const quotations = await getAllQuotations();
+      setDevis(quotations || []);
+      setFilteredDevis(quotations || []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setDevis([]);
+      setFilteredDevis([]);
+      setProducts([]);
+      setNormalClients([]);
+      setCompanyClients([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchQuotations = async () => {
+    try {
       setIsLoading(true);
-      try {
-        const quotations = await getAllQuotations();
-        setDevis(quotations || []);
-        setFilteredDevis(quotations || []); // Initialize filteredDevis with full list
-        const productList = await productsApi.getAll();
-        setProducts(productList || []);
-        const normalClientsList = await getNormalClients();
-        const mappedNormalClients = normalClientsList.map(mapApiDataToNormal);
-        setNormalClients(mappedNormalClients || []);
-        const companyClientsList = await getCompanyClients();
-        const mappedCompanyClients = companyClientsList.map(mapApiDataToCompanyClient);
-        setCompanyClients(mappedCompanyClients || []);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setDevis([]);
-        setFilteredDevis([]); // Reset filteredDevis on error
-        setProducts([]);
-        setNormalClients([]);
-        setCompanyClients([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      const quotations = await getAllQuotations();
+      setDevis(quotations || []);
+      setFilteredDevis(quotations || []);
+    } catch (error) {
+      console.error('Failed to fetch quotations:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -54,29 +82,19 @@ export default function Devis() {
     try {
       const newQuotation = await createQuotation(quotationRequest);
       setDevis([...devis, newQuotation]);
-      setFilteredDevis([...devis, newQuotation]); // Update filtered list
+      setFilteredDevis([...filteredDevis, newQuotation]);
+      setShowForm(false);
     } catch (error) {
-      console.error('Error creating quotation:', error);
+      console.error('Failed to create quotation:', error);
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleUpdateQuotation = async (updatedDevis: Quotation) => {
     try {
-      await deleteQuotation(id);
-      setDevis(devis.filter(item => item.Id !== id));
-      setFilteredDevis(filteredDevis.filter(item => item.Id !== id)); // Update filtered list
-      if (selectedQuotation?.item.Id === id) setSelectedQuotation(null);
-    } catch (error) {
-      console.error('Error deleting quotation:', error);
-    }
-  };
-
-  const handleUpdate = async (updatedQuotation: Quotation) => {
-    try {
-      const quotationUpdateRequest: QuotationUpdateRequest = {
-        Id: updatedQuotation.Id,
-        ProjectName: updatedQuotation.ProjectName,
-        Designations: updatedQuotation.Designations.map(d => ({
+      const updateRequest: QuotationUpdateRequest = {
+        Id: updatedDevis.Id,
+        ProjectName: updatedDevis.ProjectName,
+        Designations: updatedDevis.Designations.map(d => ({
           Id: d.Id || 0,
           Name: d.Name,
           Products: d.Products.map(p => ({
@@ -84,23 +102,63 @@ export default function Devis() {
             Quantity: p.Quantity,
           })),
         })),
+        CustomerType: updatedDevis.CustomerType,
+        CustomerId: updatedDevis.CustomerId,
       };
-      const updated = await updateQuotation(updatedQuotation.Id, quotationUpdateRequest);
-      setDevis(devis.map(item => (item.Id === updatedQuotation.Id ? updated : item)));
-      setFilteredDevis(filteredDevis.map(item => (item.Id === updatedQuotation.Id ? updated : item))); // Update filtered list
-      setSelectedQuotation({ item: updated, editMode: false });
+
+      console.log('Update request payload:', JSON.stringify(updateRequest, null, 2));
+      await updateQuotation(updatedDevis.Id, updateRequest);
+
+      const client =
+        updatedDevis.CustomerType === 'NORMAL'
+          ? normalClients.find(c => c.id === updatedDevis.CustomerId)
+          : companyClients.find(c => c.id === updatedDevis.CustomerId);
+
+      const enrichedCustomerDetails: CustomerDetails = client
+        ? {
+            id: client.id ?? 0,
+            FullName: 'fullName' in client ? client.fullName : undefined,
+            CompanyName: 'companyName' in client ? client.companyName : undefined,
+            Address: client.address,
+            Email: client.email,
+            PhoneNumber: 'phoneNumber' in client ? client.phoneNumber : undefined,
+            CIN: 'cin' in client ? client.cin as string | undefined : undefined, // Type cast to fix
+            MatriculeFiscal: 'matriculeFiscal' in client ? client.matriculeFiscal : undefined,
+          }
+        : {
+            id: updatedDevis.CustomerId,
+            FullName: updatedDevis.CustomerType === 'NORMAL' ? 'Unknown Client' : undefined,
+            CompanyName: updatedDevis.CustomerType === 'COMPANY' ? 'Unknown Company' : undefined,
+          };
+
+      const enrichedQuotation: Quotation = {
+        ...updatedDevis,
+        CustomerDetails: enrichedCustomerDetails,
+      };
+
+      setDevis(devis.map(q => (q.Id === enrichedQuotation.Id ? enrichedQuotation : q)));
+      setFilteredDevis(filteredDevis.map(q => (q.Id === enrichedQuotation.Id ? enrichedQuotation : q)));
+      console.log('Quotation updated:', enrichedQuotation);
+      setSelectedQuotation(null);
     } catch (error) {
-      console.error('Error updating quotation:', error);
+      console.error('Failed to update quotation:', error);
+      throw error;
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteQuotation(id);
+      setDevis(devis.filter((item) => item.Id !== id));
+      setFilteredDevis(filteredDevis.filter((item) => item.Id !== id));
+      if (selectedQuotation?.item.Id === id) setSelectedQuotation(null);
+    } catch (error) {
+      console.error('Error deleting quotation:', error);
     }
   };
 
   const exportToPDF = () => {
     console.log('Exporting to PDF...');
-  };
-
-  const convertToFacture = (id: number) => {
-    console.log('Converting to facture...', id);
-    if (selectedQuotation?.item.Id === id) setSelectedQuotation(null);
   };
 
   const showQuotation = (devisItem: Quotation) => {
@@ -118,24 +176,32 @@ export default function Devis() {
   return (
     <div className="bg-white shadow rounded-lg">
       <div className="px-4 py-5 sm:p-6">
-        <DevisHeader onNewQuotationClick={() => setShowForm(true)} />
-        {showForm && (
+        <DevisHeader
+          onNewQuotationClick={() => {
+            console.log('New Quotation clicked, setting showForm to true');
+            setShowForm(true);
+          }}
+        />
+        {showForm ? (
           <QuotationForm
             normalClients={normalClients}
             companyClients={companyClients}
             products={products}
             onSubmit={handleSubmit}
-            onCancel={() => setShowForm(false)}
+            onCancel={() => {
+              console.log('Cancel clicked, setting showForm to false');
+              setShowForm(false);
+            }}
           />
-        )}
-        <QuotationSearchFilter devis={devis} onFilterChange={handleFilterChange} /> {/* Add search/filter component */}
+        ) : null}
+        <QuotationSearchFilter devis={devis} onFilterChange={handleFilterChange} />
         <QuotationTable
-          devis={filteredDevis} // Use filtered list instead of full devis
+          devis={filteredDevis}
           isLoading={isLoading}
           onShowQuotation={showQuotation}
           onEditQuotation={editQuotation}
           onDeleteQuotation={handleDelete}
-          onConvertToFacture={convertToFacture}
+          refreshQuotations={fetchQuotations}
         />
         {selectedQuotation && (
           <QuotationModal
@@ -145,10 +211,10 @@ export default function Devis() {
             companyClients={companyClients}
             onClose={() => setSelectedQuotation(null)}
             onExportPDF={exportToPDF}
-            onConvertToFacture={convertToFacture}
             onDelete={handleDelete}
-            onUpdate={handleUpdate}
+            onUpdate={handleUpdateQuotation}
             initialEditMode={selectedQuotation.editMode}
+            refreshQuotations={fetchQuotations}
           />
         )}
       </div>

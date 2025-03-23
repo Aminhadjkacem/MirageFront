@@ -1,10 +1,8 @@
 import axios from 'axios';
 import { NormalClient } from '../types/client';
 
-// Define the API base URL
-const API_BASE_URL = 'https://localhost:7060/api'; // Base URL for your API
+const API_BASE_URL = 'https://localhost:7060/api';
 
-// Axios instance for making requests
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -12,21 +10,19 @@ const axiosInstance = axios.create({
   },
 });
 
-// Define an interface for Client Data (based on expected structure)
-interface ClientData {
+export interface ClientData {
   Id?: number;
   FullName: string;
   PhoneNumber: string;
   Address: string;
-  Email: string;
+  Email: string | null;
   CIN: string;
 }
 
-// Function to get all normal clients
 export const getNormalClients = async (): Promise<ClientData[]> => {
   try {
     const response = await axiosInstance.get('/NormalCustomer');
-    console.log(response.data); // Debugging
+    console.log('Fetched normal clients:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching normal clients:', error);
@@ -34,8 +30,7 @@ export const getNormalClients = async (): Promise<ClientData[]> => {
   }
 };
 
-// Function to get a specific normal client by ID
-export const getNormalClientById = async (id: string): Promise<ClientData> => {
+export const getNormalClientById = async (id: number): Promise<ClientData> => {
   try {
     const response = await axiosInstance.get(`/NormalCustomer/${id}`);
     return response.data;
@@ -45,19 +40,29 @@ export const getNormalClientById = async (id: string): Promise<ClientData> => {
   }
 };
 
-// Function to create a new normal client
 export const createNormalClient = async (clientData: ClientData): Promise<ClientData> => {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { Id: _, ...dataWithoutId } = clientData; // Rename Id to _ to indicate it's unused
-    const response = await axiosInstance.post('/NormalCustomer', dataWithoutId);
-    return response.data;
-  } catch (error) {
+    // Exclude Id from the payload without assigning it to a variable
+    const payload = { ...clientData, Id: undefined };
+    delete payload.Id; // Ensure Id is removed
+    console.log('Sending from clientApi:', JSON.stringify(payload, null, 2));
+    
+    const response = await axiosInstance.post('/NormalCustomer', payload);
+    console.log('API response:', response.status, JSON.stringify(response.data, null, 2));
+    
+    return response.data; // Return full ClientData
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response?.status === 500) {
+      const responseData = error.response.data as ClientData;
+      if (responseData && 'Id' in responseData) {
+        console.log('Data saved despite 500:', responseData);
+        return responseData; // Trust the 500 response data
+      }
+    }
     console.error('Error creating normal client:', error);
     throw error;
   }
 };
-// Function to update an existing normal client
 export const updateNormalClient = async (phoneNumber: string, clientData: ClientData): Promise<ClientData> => {
   try {
     const response = await axiosInstance.patch(`/NormalCustomer/${phoneNumber}`, clientData);
@@ -68,7 +73,6 @@ export const updateNormalClient = async (phoneNumber: string, clientData: Client
   }
 };
 
-// Function to delete a normal client
 export const deleteNormalClient = async (phoneNumber: string): Promise<void> => {
   try {
     await axiosInstance.delete(`/NormalCustomer/${phoneNumber}`);
@@ -78,28 +82,25 @@ export const deleteNormalClient = async (phoneNumber: string): Promise<void> => 
   }
 };
 
-// Helper function to map API data to our client interface
 export const mapApiDataToNormalClient = (apiData: ClientData): NormalClient => {
   return {
     id: apiData.Id,
-    fullName: apiData.FullName, // Ensure correct casing
+    fullName: apiData.FullName,
     phoneNumber: apiData.PhoneNumber,
     address: apiData.Address,
-    email: apiData.Email,
-    identityCardNumber: apiData.CIN
+    email: apiData.Email ?? '',
+    identityCardNumber: apiData.CIN,
   };
 };
 
-
-// Helper function to map our client interface to API data
 export const mapNormalClientToApiData = (client: NormalClient): ClientData => {
   return {
-    Id: client.id, // client.id is number | undefined, but Id must be number
+    Id: client.id,
     FullName: client.fullName,
     PhoneNumber: client.phoneNumber,
     Address: client.address,
-    Email: client.email,
-    CIN: client.identityCardNumber
+    Email: client.email || null,
+    CIN: client.identityCardNumber,
   };
 };
 export const mapApiDataToNormal = (apiData: ClientData): NormalClient => {
@@ -108,7 +109,7 @@ export const mapApiDataToNormal = (apiData: ClientData): NormalClient => {
     fullName: apiData.FullName, // Fix casing
     phoneNumber: apiData.PhoneNumber,
     address: apiData.Address,
-    email: apiData.Email,
+    email: apiData.Email|| '', // Ensure proper mapping
     identityCardNumber: apiData.CIN // Ensure proper mapping
   };
 };
