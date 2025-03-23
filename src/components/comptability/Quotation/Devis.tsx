@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { QuotationModal } from './QuotationModal';
 import { DevisHeader } from './DevisHeader';
 import { QuotationForm } from './QuotationForm';
@@ -19,6 +21,7 @@ import { getNormalClients, mapApiDataToNormal } from '../../../api/clientApi';
 import { getCompanyClients, mapApiDataToCompanyClient } from '../../../api/companyApi';
 import { NormalClient, CompanyClient } from '../../../types/client';
 import { Product } from '../../../types/product';
+import { AxiosError } from 'axios';
 
 export default function Devis() {
   const [devis, setDevis] = useState<Quotation[]>([]);
@@ -50,7 +53,8 @@ export default function Devis() {
       setDevis(quotations || []);
       setFilteredDevis(quotations || []);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Erreur lors du chargement des données:', error);
+      toast.error('Échec du chargement des données initiales.');
       setDevis([]);
       setFilteredDevis([]);
       setProducts([]);
@@ -68,7 +72,8 @@ export default function Devis() {
       setDevis(quotations || []);
       setFilteredDevis(quotations || []);
     } catch (error) {
-      console.error('Failed to fetch quotations:', error);
+      console.error('Échec du chargement des devis:', error);
+      toast.error('Échec de l’actualisation des devis.');
     } finally {
       setIsLoading(false);
     }
@@ -84,8 +89,16 @@ export default function Devis() {
       setDevis([...devis, newQuotation]);
       setFilteredDevis([...filteredDevis, newQuotation]);
       setShowForm(false);
+      toast.success('Devis créé avec succès !');
     } catch (error) {
-      console.error('Failed to create quotation:', error);
+      const axiosError = error as AxiosError;
+      console.log('Erreur Axios brute:', axiosError); // Translated debug log
+      console.log('Données de la réponse:', axiosError.response?.data); // Translated debug log
+      const errorMessage = axiosError.response?.data
+        ? String(axiosError.response.data) // e.g., "Stock insuffisant..."
+        : 'Échec de la création du devis en raison d’une erreur inconnue.';
+      console.error('Échec de la création du devis:', axiosError);
+      toast.error(errorMessage); // Show detailed backend message
     }
   };
 
@@ -106,7 +119,7 @@ export default function Devis() {
         CustomerId: updatedDevis.CustomerId,
       };
 
-      console.log('Update request payload:', JSON.stringify(updateRequest, null, 2));
+      console.log('Charge utile de la requête de mise à jour:', JSON.stringify(updateRequest, null, 2)); // Translated debug log
       await updateQuotation(updatedDevis.Id, updateRequest);
 
       const client =
@@ -122,13 +135,13 @@ export default function Devis() {
             Address: client.address,
             Email: client.email,
             PhoneNumber: 'phoneNumber' in client ? client.phoneNumber : undefined,
-            CIN: 'cin' in client ? client.cin as string | undefined : undefined, // Type cast to fix
+            CIN: 'cin' in client ? client.cin as string | undefined : undefined,
             MatriculeFiscal: 'matriculeFiscal' in client ? client.matriculeFiscal : undefined,
           }
         : {
             id: updatedDevis.CustomerId,
-            FullName: updatedDevis.CustomerType === 'NORMAL' ? 'Unknown Client' : undefined,
-            CompanyName: updatedDevis.CustomerType === 'COMPANY' ? 'Unknown Company' : undefined,
+            FullName: updatedDevis.CustomerType === 'NORMAL' ? 'Client inconnu' : undefined,
+            CompanyName: updatedDevis.CustomerType === 'COMPANY' ? 'Entreprise inconnue' : undefined,
           };
 
       const enrichedQuotation: Quotation = {
@@ -138,10 +151,12 @@ export default function Devis() {
 
       setDevis(devis.map(q => (q.Id === enrichedQuotation.Id ? enrichedQuotation : q)));
       setFilteredDevis(filteredDevis.map(q => (q.Id === enrichedQuotation.Id ? enrichedQuotation : q)));
-      console.log('Quotation updated:', enrichedQuotation);
+      console.log('Devis mis à jour:', enrichedQuotation); // Translated debug log
       setSelectedQuotation(null);
+      toast.success('Devis mis à jour avec succès !');
     } catch (error) {
-      console.error('Failed to update quotation:', error);
+      console.error('Échec de la mise à jour du devis:', error);
+      toast.error('Échec de la mise à jour du devis.');
       throw error;
     }
   };
@@ -152,13 +167,16 @@ export default function Devis() {
       setDevis(devis.filter((item) => item.Id !== id));
       setFilteredDevis(filteredDevis.filter((item) => item.Id !== id));
       if (selectedQuotation?.item.Id === id) setSelectedQuotation(null);
+      toast.success('Devis supprimé avec succès !');
     } catch (error) {
-      console.error('Error deleting quotation:', error);
+      console.error('Erreur lors de la suppression du devis:', error);
+      toast.error('Échec de la suppression du devis.');
     }
   };
 
   const exportToPDF = () => {
-    console.log('Exporting to PDF...');
+    console.log('Exportation en PDF...'); // Translated debug log
+    toast.info('Exportation PDF déclenchée (non implémentée pour l’instant).');
   };
 
   const showQuotation = (devisItem: Quotation) => {
@@ -178,7 +196,7 @@ export default function Devis() {
       <div className="px-4 py-5 sm:p-6">
         <DevisHeader
           onNewQuotationClick={() => {
-            console.log('New Quotation clicked, setting showForm to true');
+            console.log('Nouveau devis cliqué, activation du formulaire'); // Translated debug log
             setShowForm(true);
           }}
         />
@@ -189,7 +207,7 @@ export default function Devis() {
             products={products}
             onSubmit={handleSubmit}
             onCancel={() => {
-              console.log('Cancel clicked, setting showForm to false');
+              console.log('Annuler cliqué, désactivation du formulaire'); // Translated debug log
               setShowForm(false);
             }}
           />
@@ -218,6 +236,7 @@ export default function Devis() {
           />
         )}
       </div>
+      <ToastContainer />
     </div>
   );
 }

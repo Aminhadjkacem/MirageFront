@@ -23,13 +23,13 @@ interface InvoiceTableProps {
 }
 
 const exportToPDF = function () {
-  console.log('Exporting invoice to PDF...');
+  console.log('Exportation de la facture en PDF...'); // Translated console log
 };
 
 export function InvoiceTable({
   devis: propDevis,
   isLoading: propIsLoading,
-  onShowInvoice = (item) => console.log('Show Invoice:', item),
+  onShowInvoice = (item) => console.log('Afficher la facture:', item), // Translated console log
   onDeleteInvoice = async (id) => await deleteQuotation(id),
   products = [],
   refreshInvoices: parentRefreshInvoices,
@@ -57,7 +57,7 @@ export function InvoiceTable({
       setDevis(data || []);
       setFilteredDevis(data || []); // Initialize filteredDevis with fetched data
     } catch (error) {
-      console.error('Failed to fetch invoices:', error);
+      console.error('Échec du chargement des factures:', error); // Translated console log
       setDevis([]);
       setFilteredDevis([]);
     } finally {
@@ -78,7 +78,7 @@ export function InvoiceTable({
     if (deleteId !== null) {
       try {
         await onDeleteInvoice(deleteId);
-        toast.success(`Invoice ${deleteId} deleted successfully!`, {
+        toast.success(`Facture ${deleteId} supprimée avec succès !`, {
           position: "top-right",
           autoClose: 3000,
         });
@@ -89,8 +89,8 @@ export function InvoiceTable({
         }
         setDeleteId(null);
       } catch (error) {
-        console.error(`Failed to delete invoice ${deleteId}:`, error);
-        toast.error(`Failed to delete Invoice ${deleteId}.`, {
+        console.error(`Échec de la suppression de la facture ${deleteId}:`, error); // Translated console log
+        toast.error(`Échec de la suppression de la facture ${deleteId}.`, {
           position: "top-right",
           autoClose: 3000,
         });
@@ -109,12 +109,12 @@ export function InvoiceTable({
       return devisItem.CustomerDetails;
     }
     return devisItem.CustomerType === 'NORMAL'
-      ? devisItem.CustomerDetails.FullName || 'Unknown Client'
-      : devisItem.CustomerDetails.CompanyName || 'Unknown Company';
+      ? devisItem.CustomerDetails.FullName || 'Client inconnu'
+      : devisItem.CustomerDetails.CompanyName || 'Entreprise inconnue';
   };
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('fr-FR', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -122,7 +122,7 @@ export function InvoiceTable({
   };
 
   if (isLoading) {
-    return <p>Loading invoices...</p>;
+    return <p>Chargement des factures...</p>;
   }
 
   const approvedDevis = filteredDevis.filter((devisItem) => devisItem.Status === QuotationStatus.APPROVED);
@@ -131,138 +131,142 @@ export function InvoiceTable({
     return (
       <>
         <InvoiceSearchFilter devis={devis} onFilterChange={handleFilterChange} />
-        <p>No approved invoices available.</p>
+        <p>Aucune facture approuvée disponible.</p>
       </>
     );
   }
 
   return (
     <>
-    <div className="bg-white shadow rounded-lg">
-      <div className="px-4 py-5 sm:p-6">
-      <h2 className="text-xl font-semibold text-gray-900">Facture</h2>
-      <br></br>
-      <InvoiceSearchFilter devis={devis} onFilterChange={handleFilterChange} />
-      <div className="mt-6">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-200 sticky top-0">
-            <tr>
-              <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
-                Client / Project
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
-                Designations
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
-                Products
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
-                Date
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
-                Total Price
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
-                Status
-              </th>
-              <th className="px-6 py-4 text-right text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {approvedDevis.map((devisItem) => (
-              <tr
-                key={devisItem.Id}
-                className="hover:bg-gray-100 transition-colors duration-150 ease-in-out"
-              >
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <div className="font-bold text-gray-900">{getClientName(devisItem)}</div>
-                  <div className="text-gray-600">({devisItem.CustomerType})</div>
-                  <div className="mt-2 text-gray-700">Project: {devisItem.ProjectName}</div>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-900">
-                  <div className="space-y-2">
-                    {devisItem.Designations.map((designation, index) => (
-                      <div key={index} className="font-medium text-gray-900">
-                        {designation.Name}
+      <div className="bg-white shadow rounded-lg">
+        <div className="px-4 py-5 sm:p-6">
+          <h2 className="text-xl font-semibold text-gray-900">Factures</h2>
+          <br />
+          <InvoiceSearchFilter devis={devis} onFilterChange={handleFilterChange} />
+          <div className="mt-6">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-200 sticky top-0">
+                <tr>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
+                    Client / Projet
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
+                    Désignations
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
+                    Produits
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
+                    Date
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
+                    Prix total
+                  </th>
+                  <th className="px-6 py-4 text-left text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
+                    Statut
+                  </th>
+                  <th className="px-6 py-4 text-right text-sm font-bold text-gray-700 uppercase tracking-wider border-b-2 border-gray-300">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {approvedDevis.map((devisItem) => (
+                  <tr
+                    key={devisItem.Id}
+                    className="hover:bg-gray-100 transition-colors duration-150 ease-in-out"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <div className="font-bold text-gray-900">{getClientName(devisItem)}</div>
+                      <div className="text-gray-600">
+                        ({devisItem.CustomerType === 'NORMAL' ? 'Client individuel' : 'Entreprise'})
                       </div>
-                    ))}
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-900">
-                  <div className="space-y-2">
-                    {devisItem.Designations.map((designation, index) => (
-                      <div key={index}>
-                        {designation.Products.map((product, productIndex) => (
-                          <div key={productIndex} className="text-gray-600">
-                            {product.ProductName || 'Unknown Product'} (Qty: {product.Quantity})
+                      <div className="mt-2 text-gray-700">Projet : {devisItem.ProjectName}</div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      <div className="space-y-2">
+                        {devisItem.Designations.map((designation, index) => (
+                          <div key={index} className="font-medium text-gray-900">
+                            {designation.Name}
                           </div>
                         ))}
                       </div>
-                    ))}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {formatDate(devisItem.CreatedAt)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {devisItem.TotalPrice.toFixed(2)} TND
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    {devisItem.Status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <div className="flex justify-end space-x-3">
-                    <button
-                      onClick={() => handleShowInvoice(devisItem)}
-                      className="text-green-600 hover:text-green-900 hover:scale-110 transition-transform duration-150"
-                      title="View Invoice"
-                    >
-                      <Eye className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={exportToPDF}
-                      className="text-gray-600 hover:text-gray-900 hover:scale-110 transition-transform duration-150"
-                      title="Export PDF"
-                    >
-                      <FileDown className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteClick(devisItem.Id)}
-                      className="text-red-600 hover:text-red-900 hover:scale-110 transition-transform duration-150"
-                      title="Delete Invoice"
-                    >
-                      <Trash className="h-5 w-5" />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      <div className="space-y-2">
+                        {devisItem.Designations.map((designation, index) => (
+                          <div key={index}>
+                            {designation.Products.map((product, productIndex) => (
+                              <div key={productIndex} className="text-gray-600">
+                                {product.ProductName || 'Produit inconnu'} (Qté : {product.Quantity})
+                              </div>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatDate(devisItem.CreatedAt)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {devisItem.TotalPrice.toFixed(2)} TND
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Approuvée
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex justify-end space-x-3">
+                        <button
+                          onClick={() => handleShowInvoice(devisItem)}
+                          className="text-green-600 hover:text-green-900 hover:scale-110 transition-transform duration-150"
+                          title="Voir la facture"
+                        >
+                          <Eye className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={exportToPDF}
+                          className="text-gray-600 hover:text-gray-900 hover:scale-110 transition-transform duration-150"
+                          title="Exporter en PDF"
+                        >
+                          <FileDown className="h-5 w-5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(devisItem.Id)}
+                          className="text-red-600 hover:text-red-900 hover:scale-110 transition-transform duration-150"
+                          title="Supprimer la facture"
+                        >
+                          <Trash className="h-5 w-5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <ConfirmationModal
+            isOpen={showConfirmDelete}
+            onClose={() => setShowConfirmDelete(false)}
+            onConfirm={handleDeleteConfirm}
+            title="Confirmer la suppression"
+            message={`Êtes-vous sûr de vouloir supprimer la facture #${deleteId} ? Cette action ne peut pas être annulée.`}
+          />
+
+          {selectedInvoice && (
+            <InvoiceModal
+              invoiceItem={selectedInvoice}
+              products={products}
+              onClose={() => setSelectedInvoice(null)}
+              onExportPDF={exportToPDF}
+              onDelete={onDeleteInvoice}
+              refreshInvoices={parentRefreshInvoices || fetchInvoices}
+            />
+          )}
+        </div>
       </div>
-
-      <ConfirmationModal
-        isOpen={showConfirmDelete}
-        onClose={() => setShowConfirmDelete(false)}
-        onConfirm={handleDeleteConfirm}
-        title="Confirm Deletion"
-        message={`Are you sure you want to delete Invoice #${deleteId}? This action cannot be undone.`}
-      />
-
-      {selectedInvoice && (
-        <InvoiceModal
-          invoiceItem={selectedInvoice}
-          products={products}
-          onClose={() => setSelectedInvoice(null)}
-          onExportPDF={exportToPDF}
-          onDelete={onDeleteInvoice}
-          refreshInvoices={parentRefreshInvoices || fetchInvoices}
-        />
-      )}</div></div>
     </>
   );
 }

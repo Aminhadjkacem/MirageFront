@@ -16,7 +16,7 @@ export function InvoiceSearchFilter({ devis, onFilterChange }: InvoiceSearchFilt
     // Filter devis to include only those with "APPROVED" (VALIDATED) status
     const validatedDevis = devis.filter(item => item.Status === QuotationStatus.APPROVED);
     const projects = Array.from(new Set(validatedDevis.map(item => item.ProjectName)));
-    return ['All Projects', ...projects]; // Include "All Projects" as the default/reset option
+    return ['Tous les projets', ...projects]; // Include "Tous les projets" as the default/reset option
   }, [devis]);
 
   // Handle search and filter logic, starting with only validated quotations
@@ -43,7 +43,7 @@ export function InvoiceSearchFilter({ devis, onFilterChange }: InvoiceSearchFilt
     }
 
     // Filter by project name
-    if (selectedProject && selectedProject !== 'All Projects') {
+    if (selectedProject && selectedProject !== 'Tous les projets') {
       result = result.filter(item => item.ProjectName === selectedProject);
     }
 
@@ -63,7 +63,7 @@ export function InvoiceSearchFilter({ devis, onFilterChange }: InvoiceSearchFilt
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search by client, project, or designation..."
+          placeholder="Rechercher par client, projet ou désignation..."
           className="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>

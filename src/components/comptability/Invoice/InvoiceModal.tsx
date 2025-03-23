@@ -28,7 +28,7 @@ export function InvoiceModal({
   const handleDeleteConfirm = async () => {
     try {
       await onDelete(invoiceItem.Id);
-      toast.success(`Invoice ${invoiceItem.Id} deleted successfully!`, {
+      toast.success(`Facture ${invoiceItem.Id} supprimée avec succès !`, {
         position: "top-right",
         autoClose: 3000,
       });
@@ -37,8 +37,8 @@ export function InvoiceModal({
       }
       onClose();
     } catch (error) {
-      console.error(`Failed to delete invoice ${invoiceItem.Id}:`, error);
-      toast.error(`Failed to delete Invoice ${invoiceItem.Id}.`, {
+      console.error(`Échec de la suppression de la facture ${invoiceItem.Id}:`, error); // Translated console log
+      toast.error(`Échec de la suppression de la facture ${invoiceItem.Id}.`, {
         position: "top-right",
         autoClose: 3000,
       });
@@ -50,14 +50,14 @@ export function InvoiceModal({
     return (
       products.find(p => p.id === productId)?.name ||
       invoiceItem.Designations.flatMap(d => d.Products).find(p => p.ProductId === productId)?.ProductName ||
-      'Unknown Product'
+      'Produit inconnu'
     );
   };
 
   const getClientName = () => {
     return invoiceItem.CustomerType === 'NORMAL'
-      ? invoiceItem.CustomerDetails.FullName || 'Unknown Client'
-      : invoiceItem.CustomerDetails.CompanyName || 'Unknown Company';
+      ? invoiceItem.CustomerDetails.FullName || 'Client inconnu'
+      : invoiceItem.CustomerDetails.CompanyName || 'Entreprise inconnue';
   };
 
   // Function to determine status badge styling
@@ -79,6 +79,18 @@ export function InvoiceModal({
     }
   };
 
+  // Translate status dynamically
+  const translateStatus = (status: QuotationStatus) => {
+    switch (status) {
+      case QuotationStatus.PENDING:
+        return 'En attente';
+      case QuotationStatus.APPROVED:
+        return 'Approuvée';
+      default:
+        return status; // Fallback to original if untranslated
+    }
+  };
+
   return (
     <>
       <div
@@ -89,13 +101,13 @@ export function InvoiceModal({
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center space-x-2">
-              <h3 className="text-xl font-semibold text-gray-900">Invoice #{invoiceItem.Id}</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Facture #{invoiceItem.Id}</h3>
               <span
                 className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(
                   invoiceItem.Status
                 )}`}
               >
-                {invoiceItem.Status}
+                {translateStatus(invoiceItem.Status)}
               </span>
             </div>
             <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -107,25 +119,27 @@ export function InvoiceModal({
           <div className="p-6 space-y-6">
             {/* Client Information */}
             <section className="bg-gray-50 p-4 rounded-md">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Client Information</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Informations sur le client</h4>
               <div className="text-gray-900">
                 <p className="font-medium">{getClientName()}</p>
-                <p className="text-sm text-gray-600">Type: {invoiceItem.CustomerType.toLowerCase()}</p>
+                <p className="text-sm text-gray-600">
+                  Type : {invoiceItem.CustomerType === 'NORMAL' ? 'client individuel' : 'entreprise'}
+                </p>
               </div>
             </section>
 
             {/* Project Information */}
             <section className="bg-gray-50 p-4 rounded-md">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Project Information</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Informations sur le projet</h4>
               <p className="text-gray-900 font-medium">{invoiceItem.ProjectName}</p>
               <p className="text-sm text-gray-600 mt-1">
-                Created: {new Date(invoiceItem.CreatedAt).toLocaleDateString()}
+                Créée le : {new Date(invoiceItem.CreatedAt).toLocaleDateString('fr-FR')}
               </p>
             </section>
 
             {/* Designations & Products */}
             <section className="bg-gray-50 p-4 rounded-md">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Designations & Products</h4>
+              <h4 className="text-sm font-medium text-gray-700 mb-2">Désignations et produits</h4>
               <div className="space-y-4">
                 {invoiceItem.Designations.map((designation, index) => (
                   <div key={index} className="border-b pb-4 last:border-b-0">
@@ -134,7 +148,7 @@ export function InvoiceModal({
                       {designation.Products.map((product, productIndex) => (
                         <div key={productIndex} className="flex items-center justify-between">
                           <span className="text-gray-700 text-sm">{getProductName(product.ProductId)}</span>
-                          <span className="text-gray-600 text-sm">Qty: {product.Quantity}</span>
+                          <span className="text-gray-600 text-sm">Qté : {product.Quantity}</span>
                         </div>
                       ))}
                     </div>
@@ -159,7 +173,7 @@ export function InvoiceModal({
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 flex items-center transition-colors"
                 >
                   <FileDown className="h-4 w-4 mr-2" />
-                  Export PDF
+                  Exporter en PDF
                 </button>
               </div>
               <div className="flex space-x-4">
@@ -168,7 +182,7 @@ export function InvoiceModal({
                   className="px-4 py-2 text-sm font-medium text-red-600 bg-red-100 rounded-md hover:bg-red-200 flex items-center transition-colors"
                 >
                   <Trash className="h-4 w-4 mr-2" />
-                  Delete
+                  Supprimer
                 </button>
               </div>
             </div>
@@ -180,8 +194,8 @@ export function InvoiceModal({
         isOpen={showConfirmDelete}
         onClose={() => setShowConfirmDelete(false)}
         onConfirm={handleDeleteConfirm}
-        title="Confirm Deletion"
-        message={`Are you sure you want to delete Invoice #${invoiceItem.Id}? This action cannot be undone.`}
+        title="Confirmer la suppression"
+        message={`Êtes-vous sûr de vouloir supprimer la facture #${invoiceItem.Id} ? Cette action ne peut pas être annulée.`}
       />
     </>
   );

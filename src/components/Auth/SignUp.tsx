@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { UserPlus, LogIn } from 'lucide-react';
 import type { UserType } from '../../App';
 import axios from 'axios';
+
 const API_BASE_URL = 'https://localhost:7060';
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -9,6 +10,7 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
 type SignUpProps = {
   onSignUp: (user: UserType) => void;
   onSwitchToLogin: () => void;
@@ -37,16 +39,16 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
   
       // Assuming the response contains user data
       const userData = response.data;
-      console.log('User data:', userData);
+      console.log('Données utilisateur:', userData); // Translated console log
       
       // Call the onSignUp function with the user data
       onSignUp({ firstName, lastName, email: mail });
     } catch (err) {
       // If the error is an Axios error, handle it
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || 'Registration failed');
+        setError(err.response?.data?.message || 'Échec de l’inscription');
       } else {
-        setError('An error occurred during registration');
+        setError('Une erreur s’est produite lors de l’inscription');
       }
     } finally {
       setIsLoading(false);
@@ -59,14 +61,14 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
         <div className="flex flex-col items-center">
           <img 
             src="logo.png" 
-            alt="DHP Manager Logo" 
+            alt="Logo DHP Manager" 
             className="h-16 w-16 mb-4"
           />
           <h2 className="text-center text-3xl font-extrabold text-gray-900">
             DHP Manager
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Create your account
+            Créez votre compte
           </p>
         </div>
         
@@ -84,7 +86,7 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
           <div className="rounded-md shadow-sm space-y-4">
             <div>
               <label htmlFor="firstName" className="sr-only">
-                First name
+                Prénom
               </label>
               <input
                 id="firstName"
@@ -92,14 +94,14 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
                 type="text"
                 required
                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="First name"
+                placeholder="Prénom"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
               />
             </div>
             <div>
               <label htmlFor="lastName" className="sr-only">
-                Last name
+                Nom
               </label>
               <input
                 id="lastName"
@@ -107,14 +109,14 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
                 type="text"
                 required
                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Last name"
+                placeholder="Nom"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
               />
             </div>
             <div>
               <label htmlFor="mail" className="sr-only">
-                Email address
+                Adresse e-mail
               </label>
               <input
                 id="mail"
@@ -122,14 +124,14 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
                 type="email"
                 required
                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                placeholder="Adresse e-mail"
                 value={mail}
                 onChange={(e) => setMail(e.target.value)}
               />
             </div>
             <div>
               <label htmlFor="password" className="sr-only">
-                Password
+                Mot de passe
               </label>
               <input
                 id="password"
@@ -137,7 +139,7 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
                 type="password"
                 required
                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+                placeholder="Mot de passe"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -153,7 +155,7 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
               <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                 <UserPlus className="h-5 w-5 text-blue-500 group-hover:text-blue-400" />
               </span>
-              {isLoading ? 'Signing up...' : 'Sign up'}
+              {isLoading ? 'Inscription en cours...' : 'S’inscrire'}
             </button>
           </div>
         </form>
@@ -164,7 +166,7 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
             className="text-sm text-blue-600 hover:text-blue-500 flex items-center justify-center gap-2 w-full"
           >
             <LogIn className="h-4 w-4" />
-            Already have an account? Sign in
+            Vous avez déjà un compte ? Connectez-vous
           </button>
         </div>
       </div>

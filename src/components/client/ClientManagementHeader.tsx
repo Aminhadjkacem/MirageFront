@@ -23,7 +23,7 @@ export default function ClientManagementHeader({
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <h2 className="text-2xl font-bold text-gray-900">Client Management</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Gestion des clients</h2>
       </div>
       <button
         onClick={onAddNew}
@@ -31,7 +31,7 @@ export default function ClientManagementHeader({
         disabled={isLoading}
       >
         <Plus className="h-5 w-5" />
-        <span>Add New {activeTab === 'normal' ? 'Client' : 'Company'}</span>
+        <span>Ajouter un nouveau {activeTab === 'normal' ? 'client' : 'entreprise'}</span>
       </button>
     </div>
   );

@@ -13,7 +13,6 @@ const apiClient = axios.create({
 export enum QuotationStatus {
   PENDING = 'PENDING',
   APPROVED = 'VALIDATED',
-  // Add more statuses as needed
 }
 
 export interface QuotationProduct {
@@ -51,19 +50,17 @@ export interface CustomerDetails {
   [key: string]: unknown; // Allow extra fields
 }
 
-// Raw response type from the API
 interface RawQuotationResponse {
   Id: number;
   ProjectName: string;
   CreatedAt: string;
   CustomerType: 'NORMAL' | 'COMPANY';
-  CustomerDetails: CustomerDetails | string | null; // Updated to handle null
+  CustomerDetails: CustomerDetails | string | null;
   Designations: Designation[];
   TotalPrice: number;
   Status: QuotationStatus;
 }
 
-// Request interface for creating a quotation (no Status)
 export interface QuotationRequest {
   Id?: number;
   ProjectName: string;
@@ -72,23 +69,21 @@ export interface QuotationRequest {
   Designations: DesignationRequest[];
 }
 
-// Request interface for updating a quotation
 export interface QuotationUpdateRequest {
   Id: number;
   ProjectName: string;
   Designations: DesignationUpdateRequest[];
-  CustomerType: 'NORMAL' | 'COMPANY'; // Added
-  CustomerId: number;                  // Added
+  CustomerType: 'NORMAL' | 'COMPANY';
+  CustomerId: number;
 }
 
-// Response interface includes Status
 export interface Quotation {
   Id: number;
   ProjectName: string;
   CustomerType: 'NORMAL' | 'COMPANY';
   CustomerId: number;
   CustomerDetails: CustomerDetails;
-  CreatedAt: string; // ISO date string
+  CreatedAt: string;
   Designations: Designation[];
   TotalPrice: number;
   Status: QuotationStatus;
@@ -117,10 +112,11 @@ export const createQuotation = async (quotation: QuotationRequest): Promise<Quot
   } catch (error) {
     const axiosError = error as AxiosError;
     console.error('Error creating quotation:', axiosError);
-    throw axiosError;
+    throw axiosError; // Throw the raw AxiosError instead of wrapping it
   }
 };
 
+// Rest of the file remains unchanged
 export const updateQuotation = async (id: number, quotation: QuotationUpdateRequest): Promise<void> => {
   try {
     const payload: QuotationUpdateRequest = {
@@ -163,7 +159,6 @@ export const deleteQuotation = async (id: number): Promise<void> => {
   }
 };
 
-// Assuming getAllQuotations is elsewhere, but should be here for consistency
 export const getAllQuotations = async (): Promise<Quotation[]> => {
   try {
     const response = await apiClient.get('/Quotations');

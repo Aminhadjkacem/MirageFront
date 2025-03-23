@@ -43,11 +43,11 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
-    if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required.';
-    if (!formData.address.trim()) newErrors.address = 'Address is required.';
-    if (!formData.city.trim()) newErrors.city = 'City is required.';
-    if (!formData.matriculeFiscal.trim()) newErrors.matriculeFiscal = 'Tax registration number is required.';
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid.';
+    if (!formData.companyName.trim()) newErrors.companyName = 'Le nom de l’entreprise est requis.';
+    if (!formData.address.trim()) newErrors.address = 'L’adresse est requise.';
+    if (!formData.city.trim()) newErrors.city = 'La ville est requise.';
+    if (!formData.matriculeFiscal.trim()) newErrors.matriculeFiscal = 'Le numéro d’immatriculation fiscale est requis.';
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'L’e-mail est invalide.';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -75,7 +75,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
         contact3Name: formData.contact3Name,
         contact3Phone: formData.contact3Phone,
       });
-      toast.success(`Company ${formData.companyName} ${client ? 'updated' : 'added'} successfully!`, {
+      toast.success(`Entreprise ${formData.companyName} ${client ? 'mise à jour' : 'ajoutée'} avec succès !`, {
         position: 'top-right',
         autoClose: 3000,
         hideProgressBar: false,
@@ -85,8 +85,8 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
       });
       onCancel();
     } catch (error) {
-      console.error('Error submitting form:', error);
-      toast.error('Failed to save company. Please try again.', {
+      console.error('Erreur lors de la soumission du formulaire:', error); // Translated console log
+      toast.error('Échec de l’enregistrement de l’entreprise. Veuillez réessayer.', {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -99,11 +99,11 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
     <>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="border-b pb-4">
-          <h4 className="text-lg font-medium text-gray-800 mb-4">Company Information</h4>
+          <h4 className="text-lg font-medium text-gray-800 mb-4">Informations sur l’entreprise</h4>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="companyName" className="block text-sm font-medium text-gray-700 mb-1">
-                Company Name <span className="text-red-500">*</span>
+                Nom de l’entreprise <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -114,7 +114,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
                 className={`block w-full rounded-md border ${
                   errors.companyName ? 'border-red-500' : 'border-gray-300'
                 } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-                placeholder="e.g., ABC Corp"
+                placeholder="ex. : ABC Corp"
                 required
                 disabled={isSubmitting}
               />
@@ -122,7 +122,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
             </div>
             <div>
               <label htmlFor="matriculeFiscal" className="block text-sm font-medium text-gray-700 mb-1">
-                Tax Registration Number <span className="text-red-500">*</span>
+                Numéro d’immatriculation fiscale <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -133,7 +133,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
                 className={`block w-full rounded-md border ${
                   errors.matriculeFiscal ? 'border-red-500' : 'border-gray-300'
                 } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-                placeholder="e.g., MF123456"
+                placeholder="ex. : MF123456"
                 required
                 disabled={isSubmitting || !!client} // Disable for existing clients
               />
@@ -143,7 +143,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
             </div>
             <div>
               <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                Address <span className="text-red-500">*</span>
+                Adresse <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -154,7 +154,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
                 className={`block w-full rounded-md border ${
                   errors.address ? 'border-red-500' : 'border-gray-300'
                 } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-                placeholder="e.g., 123 Business St"
+                placeholder="ex. : 123 Rue des Affaires"
                 required
                 disabled={isSubmitting}
               />
@@ -162,7 +162,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
             </div>
             <div>
               <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
-                City <span className="text-red-500">*</span>
+                Ville <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -173,7 +173,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
                 className={`block w-full rounded-md border ${
                   errors.city ? 'border-red-500' : 'border-gray-300'
                 } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-                placeholder="e.g., New York"
+                placeholder="ex. : Paris"
                 required
                 disabled={isSubmitting}
               />
@@ -181,7 +181,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
             </div>
             <div className="sm:col-span-2">
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+                E-mail
               </label>
               <input
                 type="email"
@@ -192,7 +192,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
                 className={`block w-full rounded-md border ${
                   errors.email ? 'border-red-500' : 'border-gray-300'
                 } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-                placeholder="e.g., contact@abccorp.com"
+                placeholder="ex. : contact@abccorp.com"
                 disabled={isSubmitting}
               />
               {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
@@ -201,12 +201,12 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
         </div>
 
         <div>
-          <h4 className="text-lg font-medium text-gray-800 mb-4">Contact Information</h4>
+          <h4 className="text-lg font-medium text-gray-800 mb-4">Informations de contact</h4>
           <div className="space-y-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="contact1Name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Contact 1 Name
+                  Nom du contact 1
                 </label>
                 <input
                   type="text"
@@ -215,13 +215,13 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
                   value={formData.contact1Name}
                   onChange={handleChange}
                   className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3"
-                  placeholder="e.g., Jane Doe"
+                  placeholder="ex. : Jeanne Dupont"
                   disabled={isSubmitting}
                 />
               </div>
               <div>
                 <label htmlFor="contact1Phone" className="block text-sm font-medium text-gray-700 mb-1">
-                  Contact 1 Phone
+                  Téléphone du contact 1
                 </label>
                 <input
                   type="tel"
@@ -232,7 +232,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
                   className={`block w-full rounded-md border ${
                     errors.contact1Phone ? 'border-red-500' : 'border-gray-300'
                   } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-                  placeholder="e.g., +1234567890"
+                  placeholder="ex. : +33123456789"
                   disabled={isSubmitting}
                 />
                 {errors.contact1Phone && (
@@ -244,7 +244,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="contact2Name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Contact 2 Name
+                  Nom du contact 2
                 </label>
                 <input
                   type="text"
@@ -253,13 +253,13 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
                   value={formData.contact2Name}
                   onChange={handleChange}
                   className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3"
-                  placeholder="e.g., John Smith"
+                  placeholder="ex. : Jean Martin"
                   disabled={isSubmitting}
                 />
               </div>
               <div>
                 <label htmlFor="contact2Phone" className="block text-sm font-medium text-gray-700 mb-1">
-                  Contact 2 Phone
+                  Téléphone du contact 2
                 </label>
                 <input
                   type="tel"
@@ -270,7 +270,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
                   className={`block w-full rounded-md border ${
                     errors.contact2Phone ? 'border-red-500' : 'border-gray-300'
                   } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-                  placeholder="e.g., +1234567890"
+                  placeholder="ex. : +33123456789"
                   disabled={isSubmitting}
                 />
                 {errors.contact2Phone && (
@@ -282,7 +282,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="contact3Name" className="block text-sm font-medium text-gray-700 mb-1">
-                  Contact 3 Name
+                  Nom du contact 3
                 </label>
                 <input
                   type="text"
@@ -291,13 +291,13 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
                   value={formData.contact3Name}
                   onChange={handleChange}
                   className="block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3"
-                  placeholder="e.g., Alice Brown"
+                  placeholder="ex. : Alice Brun"
                   disabled={isSubmitting}
                 />
               </div>
               <div>
                 <label htmlFor="contact3Phone" className="block text-sm font-medium text-gray-700 mb-1">
-                  Contact 3 Phone
+                  Téléphone du contact 3
                 </label>
                 <input
                   type="tel"
@@ -308,7 +308,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
                   className={`block w-full rounded-md border ${
                     errors.contact3Phone ? 'border-red-500' : 'border-gray-300'
                   } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-                  placeholder="e.g., +1234567890"
+                  placeholder="ex. : +33123456789"
                   disabled={isSubmitting}
                 />
                 {errors.contact3Phone && (
@@ -326,7 +326,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors disabled:opacity-50"
             disabled={isSubmitting}
           >
-            Cancel
+            Annuler
           </button>
           <button
             type="submit"
@@ -334,7 +334,7 @@ export default function CompanyClientForm({ client, onSubmit, onCancel }: Compan
             disabled={isSubmitting}
           >
             <CheckCircle className="h-4 w-4 mr-2" />
-            {isSubmitting ? 'Saving...' : client ? 'Update Company' : 'Create Company'}
+            {isSubmitting ? 'Enregistrement...' : client ? 'Mettre à jour l’entreprise' : 'Créer l’entreprise'}
           </button>
         </div>
       </form>

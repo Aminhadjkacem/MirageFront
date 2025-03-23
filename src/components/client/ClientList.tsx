@@ -28,7 +28,7 @@ export default function ClientList({
         <div className="relative">
           <input
             type="text"
-            placeholder="Search clients..."
+            placeholder="Rechercher des clients..."
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={searchTerm}
             onChange={(e) => onSearch(e.target.value)}
@@ -40,7 +40,7 @@ export default function ClientList({
       {isLoading && ((activeTab === 'normal' && normalClients.length === 0) || 
                      (activeTab === 'company' && companyClients.length === 0)) ? (
         <div className="flex justify-center py-8 flex-grow">
-          <div className="animate-pulse text-gray-500">Loading {activeTab === 'normal' ? 'clients' : 'companies'}...</div>
+          <div className="animate-pulse text-gray-500">Chargement des {activeTab === 'normal' ? 'clients' : 'entreprises'}...</div>
         </div>
       ) : (
         <div className="flex-grow overflow-y-auto max-h-[calc(100vh-16rem)]"> {/* Scrollable container */}
@@ -73,7 +73,7 @@ function NormalClientsList({ clients, selectedClient, onSelectClient }: NormalCl
   if (clients.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
-        No clients found
+        Aucun client trouvé
       </div>
     );
   }
@@ -108,7 +108,7 @@ function CompanyClientsList({ clients, selectedClient, onSelectClient }: Company
   if (clients.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
-        No companies found
+        Aucune entreprise trouvée
       </div>
     );
   }

@@ -17,7 +17,7 @@ import {
   deleteNormalClient,
   mapApiDataToNormalClient,
   mapNormalClientToApiData,
-  ClientData, // Import ClientData
+  ClientData,
 } from '../../api/clientApi';
 import {
   getCompanyClients,
@@ -26,7 +26,7 @@ import {
   createCompanyClient,
   mapApiDataToCompanyClient,
   mapCompanyClientToApiData,
-  CompanyApiData, // Import CompanyApiData
+  CompanyApiData,
 } from '../../api/companyApi';
 
 export default function ClientManagement() {
@@ -57,10 +57,10 @@ export default function ClientManagement() {
           const apiCompanies = await getCompanyClients();
           const mappedCompanies = apiCompanies.map(company => mapApiDataToCompanyClient(company));
           setCompanyClients(mappedCompanies);
-          console.log('Company clients set:', mappedCompanies);
+          console.log('Clients entreprises définis:', mappedCompanies); // Translated console log
         }
       } catch (err) {
-        setError(`Failed to fetch ${activeTab === 'normal' ? 'clients' : 'companies'}. Please try again later.`);
+        setError(`Échec du chargement des ${activeTab === 'normal' ? 'clients' : 'entreprises'}. Veuillez réessayer plus tard.`);
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -127,17 +127,17 @@ export default function ClientManagement() {
         const client = selectedClient as NormalClient;
         await deleteNormalClient(client.phoneNumber);
         setNormalClients(normalClients.filter(c => c.id !== client.id));
-        showNotification('Client deleted successfully', 'success');
+        showNotification('Client supprimé avec succès', 'success');
       } else {
         const company = selectedClient as CompanyClient;
         await deleteCompanyClient(company.matriculeFiscal || '');
         setCompanyClients(companyClients.filter(c => c.id !== company.id));
-        showNotification('Company deleted successfully', 'success');
+        showNotification('Entreprise supprimée avec succès', 'success');
       }
       setSelectedClient(null);
     } catch (err) {
-      setError(`Failed to delete ${activeTab === 'normal' ? 'client' : 'company'}. Please try again.`);
-      showNotification(`Failed to delete ${activeTab === 'normal' ? 'client' : 'company'}`, 'error');
+      setError(`Échec de la suppression du ${activeTab === 'normal' ? 'client' : 'entreprise'}. Veuillez réessayer.`);
+      showNotification(`Échec de la suppression du ${activeTab === 'normal' ? 'client' : 'entreprise'}`, 'error');
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -161,14 +161,14 @@ export default function ClientManagement() {
               client.phoneNumber === normalClientData.phoneNumber ? { ...normalClientData, id: (selectedClient as NormalClient).id } : client
             )
           );
-          showNotification('Client updated successfully', 'success');
+          showNotification('Client mis à jour avec succès', 'success');
         } else {
           const apiData = mapNormalClientToApiData(normalClientData as NormalClient);
-          console.log('Submitting new normal client:', apiData);
+          console.log('Soumission d’un nouveau client normal:', apiData); // Translated console log
           const newClient = await createNormalClient(apiData);
-          console.log('New client returned:', newClient);
+          console.log('Nouveau client retourné:', newClient); // Translated console log
           setNormalClients(prevClients => [...prevClients, mapApiDataToNormalClient(newClient)]);
-          showNotification('Client created successfully', 'success');
+          showNotification('Client créé avec succès', 'success');
         }
       } else {
         const companyClientData = clientData as Omit<CompanyClient, 'id'>;
@@ -182,24 +182,24 @@ export default function ClientManagement() {
                 : company
             )
           );
-          showNotification('Company updated successfully', 'success');
+          showNotification('Entreprise mise à jour avec succès', 'success');
         } else {
           const apiData = mapCompanyClientToApiData(companyClientData as CompanyClient);
-          console.log('Submitting new company:', apiData);
+          console.log('Soumission d’une nouvelle entreprise:', apiData); // Translated console log
           const newCompany = await createCompanyClient(apiData);
-          console.log('New company returned:', newCompany);
+          console.log('Nouvelle entreprise retournée:', newCompany); // Translated console log
           setCompanyClients(prevCompanies => [...prevCompanies, mapApiDataToCompanyClient(newCompany)]);
-          showNotification('Company created successfully', 'success');
+          showNotification('Entreprise créée avec succès', 'success');
         }
       }
       setShowForm(false);
       setSelectedClient(null);
     } catch (err: unknown) {
-      console.error('Form submission error:', err);
+      console.error('Erreur lors de la soumission du formulaire:', err); // Translated console log
       if (axios.isAxiosError(err) && err.response?.status === 500) {
         const responseData = err.response.data;
         if (typeof responseData === 'object' && responseData !== null && 'Id' in responseData) {
-          console.log('Using 500 response data:', responseData);
+          console.log('Utilisation des données de réponse 500:', responseData); // Translated console log
           if (activeTab === 'normal') {
             setNormalClients(prevClients => {
               const alreadyExists = prevClients.some(client => client.id === responseData.Id);
@@ -208,7 +208,7 @@ export default function ClientManagement() {
               }
               return prevClients;
             });
-            showNotification('Client created successfully', 'success');
+            showNotification('Client créé avec succès', 'success');
           } else {
             setCompanyClients(prevCompanies => {
               const alreadyExists = prevCompanies.some(company => company.id === responseData.Id);
@@ -217,15 +217,15 @@ export default function ClientManagement() {
               }
               return prevCompanies;
             });
-            showNotification('Company created successfully', 'success');
+            showNotification('Entreprise créée avec succès', 'success');
           }
           setShowForm(false);
           setSelectedClient(null);
           return;
         }
       }
-      setError(`Failed to save ${activeTab === 'normal' ? 'client' : 'company'}. Please try again.`);
-      showNotification(`Failed to save ${activeTab === 'normal' ? 'client' : 'company'}`, 'error');
+      setError(`Échec de l’enregistrement du ${activeTab === 'normal' ? 'client' : 'entreprise'}. Veuillez réessayer.`);
+      showNotification(`Échec de l’enregistrement du ${activeTab === 'normal' ? 'client' : 'entreprise'}`, 'error');
     } finally {
       setIsLoading(false);
     }

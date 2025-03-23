@@ -16,7 +16,7 @@ export function QuotationSearchFilter({ devis, onFilterChange }: QuotationSearch
     // Filter devis to include only those with "PENDING" status
     const pendingDevis = devis.filter(item => item.Status === QuotationStatus.PENDING);
     const projects = Array.from(new Set(pendingDevis.map(item => item.ProjectName)));
-    return ['All Projects', ...projects]; // Include "All Projects" as the default/reset option
+    return ['Tous les projets', ...projects]; // Include "Tous les projets" as the default/reset option
   }, [devis]);
 
   // Handle search and filter logic, starting with only pending quotations
@@ -43,7 +43,7 @@ export function QuotationSearchFilter({ devis, onFilterChange }: QuotationSearch
     }
 
     // Filter by project name
-    if (selectedProject && selectedProject !== 'All Projects') {
+    if (selectedProject && selectedProject !== 'Tous les projets') {
       result = result.filter(item => item.ProjectName === selectedProject);
     }
 
@@ -63,7 +63,7 @@ export function QuotationSearchFilter({ devis, onFilterChange }: QuotationSearch
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search by client, project, or designation..."
+          placeholder="Rechercher par client, projet ou désignation..."
           className="w-full px-4 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>

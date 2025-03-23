@@ -41,11 +41,11 @@ export default function ProductForm({
 
   const validateForm = () => {
     const newErrors: Partial<ProductFormData> = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.description.trim()) newErrors.description = 'Description is required';
-    if (!formData.price || parseFloat(formData.price) < 0) newErrors.price = 'Price must be 0 or greater';
-    if (!formData.stock || parseInt(formData.stock) < 0) newErrors.stock = 'Stock must be 0 or greater';
-    if (!formData.category.trim()) newErrors.category = 'Category is required';
+    if (!formData.name.trim()) newErrors.name = 'Le nom est requis';
+    if (!formData.description.trim()) newErrors.description = 'La description est requise';
+    if (!formData.price || parseFloat(formData.price) < 0) newErrors.price = 'Le prix doit être supérieur ou égal à 0';
+    if (!formData.stock || parseInt(formData.stock) < 0) newErrors.stock = 'Le stock doit être supérieur ou égal à 0';
+    if (!formData.category.trim()) newErrors.category = 'La catégorie est requise';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -72,14 +72,14 @@ export default function ProductForm({
         {/* Header */}
         <div className="flex justify-between items-center border-b pb-4">
           <h3 className="text-lg font-semibold text-gray-800">
-            {isEditing ? 'Edit Product' : 'Add New Product'}
+            {isEditing ? 'Modifier le produit' : 'Ajouter un nouveau produit'}
           </h3>
           <button
             type="button"
             onClick={onClose}
             className="text-gray-600 hover:text-gray-800 transition-colors disabled:opacity-50"
             disabled={isSubmitting}
-            aria-label="Close"
+            aria-label="Fermer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -89,7 +89,7 @@ export default function ProductForm({
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name <span className="text-red-500">*</span>
+              Nom <span className="text-red-500">*</span>
             </label>
             <input
               ref={nameInputRef}
@@ -99,7 +99,7 @@ export default function ProductForm({
               className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 ${
                 errors.name ? 'border-red-300' : ''
               }`}
-              placeholder="e.g., iPhone 14"
+              placeholder="ex. : iPhone 14"
               disabled={isSubmitting}
             />
             {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
@@ -115,7 +115,7 @@ export default function ProductForm({
               className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 ${
                 errors.description ? 'border-red-300' : ''
               }`}
-              placeholder="e.g., Latest smartphone with advanced features"
+              placeholder="ex. : Dernier smartphone avec des fonctionnalités avancées"
               rows={3}
               disabled={isSubmitting}
             />
@@ -125,7 +125,7 @@ export default function ProductForm({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Price (TND) <span className="text-red-500">*</span>
+                Prix (TND) <span className="text-red-500">*</span>
               </label>
               <input
                 type="number"
@@ -136,7 +136,7 @@ export default function ProductForm({
                 className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 ${
                   errors.price ? 'border-red-300' : ''
                 }`}
-                placeholder="e.g., 999.99"
+                placeholder="ex. : 999.99"
                 disabled={isSubmitting}
               />
               {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
@@ -153,7 +153,7 @@ export default function ProductForm({
                 className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 ${
                   errors.stock ? 'border-red-300' : ''
                 }`}
-                placeholder="e.g., 50"
+                placeholder="ex. : 50"
                 disabled={isSubmitting}
               />
               {errors.stock && <p className="mt-1 text-sm text-red-600">{errors.stock}</p>}
@@ -162,7 +162,7 @@ export default function ProductForm({
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category <span className="text-red-500">*</span>
+              Catégorie <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -171,7 +171,7 @@ export default function ProductForm({
               className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3 ${
                 errors.category ? 'border-red-300' : ''
               }`}
-              placeholder="e.g., Electronics"
+              placeholder="ex. : Électronique"
               disabled={isSubmitting}
             />
             {errors.category && <p className="mt-1 text-sm text-red-600">{errors.category}</p>}
@@ -186,7 +186,7 @@ export default function ProductForm({
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors disabled:opacity-50"
             disabled={isSubmitting}
           >
-            Cancel
+            Annuler
           </button>
           <button
             type="submit"
@@ -198,7 +198,7 @@ export default function ProductForm({
             ) : (
               <CheckCircle className="h-4 w-4 mr-2" />
             )}
-            {isSubmitting ? 'Saving...' : isEditing ? 'Update' : 'Save'}
+            {isSubmitting ? 'Enregistrement...' : isEditing ? 'Mettre à jour' : 'Enregistrer'}
           </button>
         </div>
       </form>

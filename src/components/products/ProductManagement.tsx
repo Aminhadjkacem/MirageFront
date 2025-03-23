@@ -34,14 +34,14 @@ export default function ProductManagement() {
       setError(null);
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error('Error fetching products:', axiosError);
+      console.error('Erreur lors de la récupération des produits :', axiosError); // Translated console log
       if (axiosError.response?.status !== 400) {
         setError(
           axiosError.response?.status === 404
-            ? 'Products endpoint not found. Check the server URL.'
-            : 'Failed to load products. Please try again.'
+            ? "L'endpoint des produits n'a pas été trouvé. Vérifiez l'URL du serveur."
+            : 'Échec du chargement des produits. Veuillez réessayer.'
         );
-        toast.error('Failed to load products.');
+        toast.error('Échec du chargement des produits.');
       }
     }
   };
@@ -63,12 +63,12 @@ export default function ProductManagement() {
 
       if (currentProduct) {
         await productsApi.patch(currentProduct.id, productData);
-        toast.success(`Product "${productData.name}" updated successfully!`);
+        toast.success(`Produit "${productData.name}" mis à jour avec succès !`);
         await fetchProducts();
       } else {
         const newProduct = await productsApi.create(productData);
         setProducts(prev => [...prev, newProduct]);
-        toast.success(`Product "${newProduct.name}" created successfully!`);
+        toast.success(`Produit "${newProduct.name}" créé avec succès !`);
         await fetchProducts();
       }
 
@@ -76,13 +76,13 @@ export default function ProductManagement() {
       setError(null);
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error('Error saving product:', axiosError);
+      console.error('Erreur lors de l’enregistrement du produit :', axiosError); // Translated console log
       const errorMessage =
         axiosError.response?.status === 400
-          ? 'Invalid product data. Please check your input.'
+          ? 'Données du produit invalides. Vérifiez vos entrées.'
           : axiosError.response?.status === 404
-          ? 'Product not found.'
-          : 'Failed to save product. Please try again.';
+          ? 'Produit non trouvé.'
+          : 'Échec de l’enregistrement du produit. Veuillez réessayer.';
       setError(errorMessage);
       toast.error(errorMessage);
     }
@@ -114,13 +114,13 @@ export default function ProductManagement() {
     try {
       await productsApi.delete(productToDelete.id);
       setProducts(prev => prev.filter(p => p.id !== productToDelete.id));
-      toast.success(`Product "${productToDelete.name}" deleted successfully!`);
+      toast.success(`Produit "${productToDelete.name}" supprimé avec succès !`);
       setError(null);
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.error('Error deleting product:', axiosError);
-      setError('Failed to delete product. Please try again.');
-      toast.error('Failed to delete product.');
+      console.error('Erreur lors de la suppression du produit :', axiosError); // Translated console log
+      setError('Échec de la suppression du produit. Veuillez réessayer.');
+      toast.error('Échec de la suppression du produit.');
     } finally {
       setIsDeleting(false);
       setIsDeleteModalOpen(false);
@@ -156,7 +156,7 @@ export default function ProductManagement() {
       <div className="flex-grow px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="max-w-7xl mx-auto h-full">
           {products.length === 0 && !error ? (
-            <div className="text-center py-8 text-gray-500">No products found</div>
+            <div className="text-center py-8 text-gray-500">Aucun produit trouvé</div>
           ) : (
             <ProductGrid products={filteredProducts} onEdit={handleEdit} onDelete={handleDelete} />
           )}
@@ -172,7 +172,7 @@ export default function ProductManagement() {
       />
       {isDeleteModalOpen && productToDelete && (
         <DeleteConfirmationModal
-          type="product"
+          type="produit"
           itemName={productToDelete.name}
           onCancel={() => {
             setIsDeleteModalOpen(false);

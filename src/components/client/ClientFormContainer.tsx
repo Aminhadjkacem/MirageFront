@@ -20,7 +20,7 @@ export default function ClientFormContainer({
   return (
     <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
       <h3 className="text-xl font-semibold text-gray-900 mb-6">
-        {isEditing ? 'Edit' : 'Add New'} {activeTab === 'normal' ? 'Individual Client' : 'Company Client'}
+        {isEditing ? 'Modifier' : 'Ajouter un nouveau'} {activeTab === 'normal' ? 'client individuel' : 'client entreprise'}
       </h3>
       {activeTab === 'normal' ? (
         <NormalClientForm

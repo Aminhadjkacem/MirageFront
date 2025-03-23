@@ -25,7 +25,7 @@ export default function ProductCard({ product, onEdit, onDelete }: ProductCardPr
       <div className="flex justify-between items-center text-sm">
         <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">{product.category}</span>
         <div className="space-x-4">
-          <span className="text-gray-600">Stock: {product.stock}</span>
+          <span className="text-gray-600">Stock : {product.stock}</span>
           <span className="font-semibold text-gray-900">{product.price} TND</span>
         </div>
       </div>

@@ -1,13 +1,14 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useState } from 'react';
-import { ToastContainer } from 'react-toastify'; // Import ToastContainer
-import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Login from './components/Auth/Login';
 import SignUp from './components/Auth/SignUp';
 import Dashboard from './components/dashboard/Dashboard';
 import ClientManagement from './components/client/ClientManagement';
 import ProductManagement from './components/products/ProductManagement';
-import Comptability from './components/comptability/index'; // Fixed path (assuming correct)
+import Comptability from './components/comptability/index';
+import Settings from './components/Infos/Settings'; // Add this import
 
 export type UserType = {
   firstName: string;
@@ -40,6 +41,7 @@ function App() {
               <Route path="/clients" element={<ClientManagement />} />
               <Route path="/products" element={<ProductManagement />} />
               <Route path="/comptability/*" element={<Comptability />} />
+              <Route path="/settings" element={<Settings />} /> {/* Add this route */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </>
           )}

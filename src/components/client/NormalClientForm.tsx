@@ -24,15 +24,15 @@ export default function NormalClientForm({ client, onSubmit, onCancel }: NormalC
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required.';
+    if (!formData.fullName.trim()) newErrors.fullName = 'Le nom complet est requis.';
     if (!formData.phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone number is required.';
+      newErrors.phoneNumber = 'Le numéro de téléphone est requis.';
     } else if (!/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Please enter a valid phone number.';
+      newErrors.phoneNumber = 'Veuillez entrer un numéro de téléphone valide.';
     }
-    if (!formData.address.trim()) newErrors.address = 'Address is required.';
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Please enter a valid email address.';
-    if (!formData.identityCardNumber.trim()) newErrors.identityCardNumber = 'Identity card number is required.';
+    if (!formData.address.trim()) newErrors.address = 'L’adresse est requise.';
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Veuillez entrer une adresse e-mail valide.';
+    if (!formData.identityCardNumber.trim()) newErrors.identityCardNumber = 'Le numéro de carte d’identité est requis.';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -48,7 +48,7 @@ export default function NormalClientForm({ client, onSubmit, onCancel }: NormalC
 
     try {
       await onSubmit(formData); // Let handleFormSubmit handle the API call
-      toast.success(`Client ${formData.fullName} ${client ? 'updated' : 'added'} successfully!`, {
+      toast.success(`Client ${formData.fullName} ${client ? 'mis à jour' : 'ajouté'} avec succès !`, {
         position: 'top-right',
         autoClose: 3000,
         hideProgressBar: false,
@@ -58,9 +58,9 @@ export default function NormalClientForm({ client, onSubmit, onCancel }: NormalC
       });
       onCancel();
     } catch (error) {
-      console.error('Error submitting form:', error);
-      setApiError('Failed to save client. Please try again.');
-      toast.error('Failed to save client. Please try again.', {
+      console.error('Erreur lors de la soumission du formulaire:', error); // Translated console log
+      setApiError('Échec de l’enregistrement du client. Veuillez réessayer.');
+      toast.error('Échec de l’enregistrement du client. Veuillez réessayer.', {
         position: 'top-right',
         autoClose: 3000,
       });
@@ -88,11 +88,11 @@ export default function NormalClientForm({ client, onSubmit, onCancel }: NormalC
         )}
 
         <div className="border-b pb-4">
-          <h4 className="text-lg font-medium text-gray-800 mb-3">Personal Information</h4>
+          <h4 className="text-lg font-medium text-gray-800 mb-3">Informations personnelles</h4>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name <span className="text-red-500">*</span>
+                Nom complet <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -103,14 +103,14 @@ export default function NormalClientForm({ client, onSubmit, onCancel }: NormalC
                 className={`block w-full rounded-md border ${
                   errors.fullName ? 'border-red-500' : 'border-gray-300'
                 } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-                placeholder="e.g., John Doe"
+                placeholder="ex. : Jean Dupont"
                 disabled={isSubmitting}
               />
               {errors.fullName && <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>}
             </div>
             <div>
               <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number <span className="text-red-500">*</span>
+                Numéro de téléphone <span className="text-red-500">*</span>
               </label>
               <input
                 type="tel"
@@ -121,23 +121,23 @@ export default function NormalClientForm({ client, onSubmit, onCancel }: NormalC
                 className={`block w-full rounded-md border ${
                   errors.phoneNumber ? 'border-red-500' : 'border-gray-300'
                 } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-                placeholder="e.g., +21612345678"
+                placeholder="ex. : +21612345678"
                 disabled={isSubmitting || !!client}
               />
               {errors.phoneNumber && <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>}
               {client && (
-                <p className="mt-1 text-xs text-gray-500">Phone number cannot be changed for existing clients.</p>
+                <p className="mt-1 text-xs text-gray-500">Le numéro de téléphone ne peut pas être modifié pour les clients existants.</p>
               )}
             </div>
           </div>
         </div>
 
         <div className="border-b pb-4">
-          <h4 className="text-lg font-medium text-gray-800 mb-3">Contact Information</h4>
+          <h4 className="text-lg font-medium text-gray-800 mb-3">Informations de contact</h4>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email (Optional)
+                E-mail (facultatif)
               </label>
               <input
                 type="email"
@@ -147,14 +147,14 @@ export default function NormalClientForm({ client, onSubmit, onCancel }: NormalC
                 className={`block w-full rounded-md border ${
                   errors.email ? 'border-red-500' : 'border-gray-300'
                 } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-                placeholder="e.g., john.doe@example.com"
+                placeholder="ex. : jean.dupont@exemple.com"
                 disabled={isSubmitting}
               />
               {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
             </div>
             <div>
               <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                Address <span className="text-red-500">*</span>
+                Adresse <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -165,7 +165,7 @@ export default function NormalClientForm({ client, onSubmit, onCancel }: NormalC
                 className={`block w-full rounded-md border ${
                   errors.address ? 'border-red-500' : 'border-gray-300'
                 } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-                placeholder="e.g., 123 Main St, City"
+                placeholder="ex. : 123 Rue Principale, Ville"
                 disabled={isSubmitting}
               />
               {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}
@@ -177,7 +177,7 @@ export default function NormalClientForm({ client, onSubmit, onCancel }: NormalC
           <h4 className="text-lg font-medium text-gray-800 mb-3">Identification</h4>
           <div>
             <label htmlFor="identityCardNumber" className="block text-sm font-medium text-gray-700 mb-1">
-              Identity Card Number <span className="text-red-500">*</span>
+              Numéro de carte d’identité <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -188,7 +188,7 @@ export default function NormalClientForm({ client, onSubmit, onCancel }: NormalC
               className={`block w-full rounded-md border ${
                 errors.identityCardNumber ? 'border-red-500' : 'border-gray-300'
               } shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3`}
-              placeholder="e.g., 12345678"
+              placeholder="ex. : 12345678"
               disabled={isSubmitting}
             />
             {errors.identityCardNumber && (
@@ -204,7 +204,7 @@ export default function NormalClientForm({ client, onSubmit, onCancel }: NormalC
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 transition-colors disabled:opacity-50"
             disabled={isSubmitting}
           >
-            Cancel
+            Annuler
           </button>
           <button
             type="submit"
@@ -212,7 +212,7 @@ export default function NormalClientForm({ client, onSubmit, onCancel }: NormalC
             disabled={isSubmitting}
           >
             <CheckCircle className="h-4 w-4 mr-2" />
-            {isSubmitting ? 'Processing...' : client ? 'Update Client' : 'Create Client'}
+            {isSubmitting ? 'Traitement...' : client ? 'Mettre à jour le client' : 'Créer le client'}
           </button>
         </div>
       </form>

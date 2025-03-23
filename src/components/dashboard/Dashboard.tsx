@@ -17,7 +17,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <img src="logo.png" alt="DHP Manager Logo" className="h-10 w-10" />
+            <img src="logo.png" alt="Logo DHP Manager" className="h-10 w-10" />
             <h1 className="text-2xl font-semibold text-gray-900">DHP Manager</h1>
           </div>
 
@@ -41,7 +41,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
                   className="w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Sign out</span>
+                  <span>Déconnexion</span>
                 </button>
               </div>
             )}
@@ -71,7 +71,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
               <Package className="h-8 w-8 text-indigo-600" />
             </div>
-            <span className="text-lg font-medium text-gray-900">Products</span>
+            <span className="text-lg font-medium text-gray-900">Produits</span>
           </Link>
 
           {/* Fournisseur Button */}
@@ -79,7 +79,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
               <Truck className="h-8 w-8 text-green-600" />
             </div>
-            <span className="text-lg font-medium text-gray-900">Fournisseur</span>
+            <span className="text-lg font-medium text-gray-900">Fournisseurs</span>
           </button>
 
           {/* Comptabilité Button */}
@@ -98,7 +98,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             <div className="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center">
               <Users2 className="h-8 w-8 text-teal-600" />
             </div>
-            <span className="text-lg font-medium text-gray-900">RH</span>
+            <span className="text-lg font-medium text-gray-900">Ressources humaines</span>
           </button>
 
           {/* Settings Button */}
@@ -109,7 +109,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
             <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center">
               <Settings className="h-8 w-8 text-purple-600" />
             </div>
-            <span className="text-lg font-medium text-gray-900">Settings</span>
+            <span className="text-lg font-medium text-gray-900">Paramètres</span>
           </Link>
         </div>
       </main>
