@@ -398,7 +398,7 @@ export function QuotationModal({
             {/* Total Price */}
             <section className="bg-gray-50 p-4 rounded-md">
               <h4 className="text-sm font-medium text-gray-700 mb-2">Total</h4>
-              <p className="text-lg font-semibold text-gray-900">{devisItem.TotalPrice.toFixed(2)} TND</p>
+              <p className="text-lg font-semibold text-gray-900">{devisItem.TotalPriceHT.toFixed(2)} TND</p>
             </section>
           </div>
 
