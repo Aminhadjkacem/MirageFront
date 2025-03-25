@@ -86,3 +86,44 @@ export const validateQuotation = async (id: number): Promise<void> => {
     throw axiosError;
   }
 };
+// Export quotation as PDF
+export const exportQuotationAsPdf = async (quotation: Quotation): Promise<void> => {
+  try {
+    const response = await apiClient.post(
+      '/Invoice/export-quotation',
+      {
+        Id: quotation.Id,
+        ProjectName: quotation.ProjectName,
+        CustomerType: quotation.CustomerType,
+        CustomerId: quotation.CustomerId,
+        Designations: quotation.Designations.map(d => ({
+          Id: d.Id,
+          Name: d.Name,
+          Products: d.Products.map(p => ({
+            ProductId: p.ProductId,
+            Quantity: p.Quantity,
+          })),
+        })),
+        TotalPrice: quotation.TotalPrice,
+        TotalPriceHT: quotation.TotalPriceHT,
+      },
+      {
+        responseType: 'blob', // Important for handling binary data (PDF)
+      }
+    );
+
+    // Create a URL for the blob and trigger the download
+    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `quotation_${quotation.Id}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url); // Clean up
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    console.error(`Error exporting quotation ${quotation.Id} as PDF:`, axiosError);
+    throw axiosError;
+  }
+};

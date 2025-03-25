@@ -117,6 +117,8 @@ export default function Devis() {
         })),
         CustomerType: updatedDevis.CustomerType,
         CustomerId: updatedDevis.CustomerId,
+        TotalPrice: updatedDevis.TotalPrice,
+        TotalPriceHT: updatedDevis.TotalPriceHT,
       };
 
       console.log('Charge utile de la requête de mise à jour:', JSON.stringify(updateRequest, null, 2)); // Translated debug log

@@ -76,6 +76,8 @@ export interface QuotationUpdateRequest {
   Designations: DesignationUpdateRequest[];
   CustomerType: 'NORMAL' | 'COMPANY';
   CustomerId: number;
+  TotalPrice: number,
+  TotalPriceHT:number,
 }
 
 export interface Quotation {
@@ -135,6 +137,8 @@ export const updateQuotation = async (id: number, quotation: QuotationUpdateRequ
       })),
       CustomerType: quotation.CustomerType,
       CustomerId: quotation.CustomerId,
+      TotalPrice: quotation.TotalPrice,
+      TotalPriceHT:quotation.TotalPriceHT
     };
 
     console.log('Sending update quotation request:', JSON.stringify(payload, null, 2));

@@ -1,7 +1,7 @@
-// src/components/comptability/InvoiceTable.tsx
 import { useState, useEffect } from 'react';
 import { Eye, FileDown, Trash } from 'lucide-react';
 import { Quotation, QuotationStatus } from '../../../api/quotationApi';
+import { exportQuotationAsPdf } from '../../../api/invoiceApi'; // Import the new method
 import { Product } from '../../../types/product';
 import { NormalClient, CompanyClient } from '../../../types/client';
 import { ConfirmationModal } from './ConfirmationModal';
@@ -22,14 +22,10 @@ interface InvoiceTableProps {
   refreshInvoices?: () => void;
 }
 
-const exportToPDF = function () {
-  console.log('Exportation de la facture en PDF...'); // Translated console log
-};
-
 export function InvoiceTable({
   devis: propDevis,
   isLoading: propIsLoading,
-  onShowInvoice = (item) => console.log('Afficher la facture:', item), // Translated console log
+  onShowInvoice = (item) => console.log('Afficher la facture:', item),
   onDeleteInvoice = async (id) => await deleteQuotation(id),
   products = [],
   refreshInvoices: parentRefreshInvoices,
@@ -46,7 +42,7 @@ export function InvoiceTable({
       fetchInvoices();
     } else {
       setDevis(propDevis);
-      setFilteredDevis(propDevis); // Initialize filteredDevis with propDevis
+      setFilteredDevis(propDevis);
     }
   }, [propDevis]);
 
@@ -55,9 +51,9 @@ export function InvoiceTable({
     try {
       const data = await getAllQuotations();
       setDevis(data || []);
-      setFilteredDevis(data || []); // Initialize filteredDevis with fetched data
+      setFilteredDevis(data || []);
     } catch (error) {
-      console.error('Échec du chargement des factures:', error); // Translated console log
+      console.error('Échec du chargement des factures:', error);
       setDevis([]);
       setFilteredDevis([]);
     } finally {
@@ -89,7 +85,7 @@ export function InvoiceTable({
         }
         setDeleteId(null);
       } catch (error) {
-        console.error(`Échec de la suppression de la facture ${deleteId}:`, error); // Translated console log
+        console.error(`Échec de la suppression de la facture ${deleteId}:`, error);
         toast.error(`Échec de la suppression de la facture ${deleteId}.`, {
           position: "top-right",
           autoClose: 3000,
@@ -102,6 +98,22 @@ export function InvoiceTable({
   const handleShowInvoice = (devisItem: Quotation) => {
     setSelectedInvoice(devisItem);
     onShowInvoice(devisItem);
+  };
+
+  const exportToPDF = async (quotation: Quotation) => {
+    try {
+      await exportQuotationAsPdf(quotation);
+      toast.success(`Facture ${quotation.Id} exportée avec succès !`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } catch (error) {
+      console.error(`Échec de l'exportation de la facture ${quotation.Id} en PDF:`, error);
+      toast.error(`Échec de l'exportation de la facture ${quotation.Id}.`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
   };
 
   const getClientName = (devisItem: Quotation): string => {
@@ -226,7 +238,7 @@ export function InvoiceTable({
                           <Eye className="h-5 w-5" />
                         </button>
                         <button
-                          onClick={exportToPDF}
+                          onClick={() => exportToPDF(devisItem)} // Pass the quotation to exportToPDF
                           className="text-gray-600 hover:text-gray-900 hover:scale-110 transition-transform duration-150"
                           title="Exporter en PDF"
                         >
@@ -260,7 +272,7 @@ export function InvoiceTable({
               invoiceItem={selectedInvoice}
               products={products}
               onClose={() => setSelectedInvoice(null)}
-              onExportPDF={exportToPDF}
+              onExportPDF={() => exportToPDF(selectedInvoice)} // Pass the export function to the modal
               onDelete={onDeleteInvoice}
               refreshInvoices={parentRefreshInvoices || fetchInvoices}
             />
