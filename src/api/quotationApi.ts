@@ -35,6 +35,7 @@ export interface DesignationUpdateRequest {
 export interface Designation {
   Id?: number; // Optional, included in response
   Name: string;
+  quantity: number; // Added quantity field
   Products: QuotationProduct[];
 }
 

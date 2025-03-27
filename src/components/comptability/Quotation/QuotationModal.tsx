@@ -35,7 +35,13 @@ export function QuotationModal({
   refreshQuotations,
 }: QuotationModalProps) {
   const [isEditing, setIsEditing] = useState(initialEditMode);
-  const [editedData, setEditedData] = useState<Quotation>({ ...devisItem });
+  const [editedData, setEditedData] = useState<Quotation>({
+    ...devisItem,
+    Designations: devisItem.Designations.map(d => ({
+      ...d,
+      Quantity: d.quantity || 1, // Default to 1 if Quantity isn’t provided
+    })),
+  });
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showConfirmValidate, setShowConfirmValidate] = useState(false);
 
@@ -50,9 +56,17 @@ export function QuotationModal({
     });
   };
 
-  const handleDesignationChange = (index: number, value: string) => {
+  const handleDesignationChange = (
+    index: number,
+    field: 'Name' | 'Quantity',
+    value: string | number
+  ) => {
     const newDesignations = [...editedData.Designations];
-    newDesignations[index].Name = value;
+    if (field === 'Name') {
+      newDesignations[index].Name = value as string;
+    } else if (field === 'Quantity') {
+      newDesignations[index].quantity = Math.max(1, parseInt(value as string) || 1); // Ensure min 1
+    }
     setEditedData({ ...editedData, Designations: newDesignations });
   };
 
@@ -76,7 +90,7 @@ export function QuotationModal({
       ...editedData,
       Designations: [
         ...editedData.Designations,
-        { Id: 0, Name: '', Products: [{ ProductId: 0, Quantity: 1 }] }, // Id: 0 for new designations
+        { Id: 0, Name: '', quantity: 1, Products: [{ ProductId: 0, Quantity: 1 }] }, // New designation with Quantity
       ],
     });
   };
@@ -114,8 +128,15 @@ export function QuotationModal({
         return;
       }
       for (const designation of editedData.Designations) {
-        if (!designation.Name.trim() || designation.Products.some(p => p.ProductId === 0 || p.Quantity <= 0)) {
-          toast.error('Toutes les désignations et produits doivent être valides.', { position: 'top-right', autoClose: 3000 });
+        if (
+          !designation.Name.trim() ||
+          designation.quantity <= 0 || // Validate designation quantity
+          designation.Products.some(p => p.ProductId === 0 || p.Quantity <= 0)
+        ) {
+          toast.error('Toutes les désignations doivent avoir un nom, une quantité valide et des produits valides.', {
+            position: 'top-right',
+            autoClose: 3000,
+          });
           return;
         }
       }
@@ -127,7 +148,7 @@ export function QuotationModal({
       });
       setIsEditing(false);
     } catch (error) {
-      console.error(`Échec de la mise à jour du devis ${devisItem.Id}:`, error); // Translated console log
+      console.error(`Échec de la mise à jour du devis ${devisItem.Id}:`, error);
       toast.error(`Échec de la mise à jour du devis #${devisItem.Id}.`, {
         position: 'top-right',
         autoClose: 3000,
@@ -144,7 +165,7 @@ export function QuotationModal({
       });
       onClose();
     } catch (error) {
-      console.error(`Échec de la suppression du devis ${devisItem.Id}:`, error); // Translated console log
+      console.error(`Échec de la suppression du devis ${devisItem.Id}:`, error);
       toast.error(`Échec de la suppression du devis #${devisItem.Id}.`, {
         position: 'top-right',
         autoClose: 3000,
@@ -166,7 +187,7 @@ export function QuotationModal({
       if (refreshQuotations) refreshQuotations();
       onClose();
     } catch (error) {
-      console.error(`Échec de la validation du devis ${devisItem.Id}:`, error); // Translated console log
+      console.error(`Échec de la validation du devis ${devisItem.Id}:`, error);
       toast.error(`Échec de la validation du devis #${devisItem.Id}.`, {
         position: 'top-right',
         autoClose: 3000,
@@ -214,7 +235,7 @@ export function QuotationModal({
       case QuotationStatus.APPROVED:
         return 'Approuvé';
       default:
-        return status; // Fallback to original if untranslated
+        return status;
     }
   };
 
@@ -265,7 +286,7 @@ export function QuotationModal({
                   />
                   <select
                     value={editedData.CustomerType}
-                    onChange={(e) => handleInputChange('CustomerType', e.target.value)}
+                    onChange={e => handleInputChange('CustomerType', e.target.value)}
                     className="w-full p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   >
                     <option value="NORMAL">Individuel</option>
@@ -289,7 +310,7 @@ export function QuotationModal({
                 <input
                   type="text"
                   value={editedData.ProjectName}
-                  onChange={(e) => handleInputChange('ProjectName', e.target.value)}
+                  onChange={e => handleInputChange('ProjectName', e.target.value)}
                   className="w-full p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   placeholder="Nom du projet"
                 />
@@ -308,14 +329,25 @@ export function QuotationModal({
                 {editedData.Designations.map((designation, index) => (
                   <div key={index} className="border-b pb-4 last:border-b-0 relative">
                     {isEditing ? (
-                      <div className="flex items-center gap-2 mb-2">
-                        <input
-                          type="text"
-                          value={designation.Name}
-                          onChange={(e) => handleDesignationChange(index, e.target.value)}
-                          className="w-full p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
-                          placeholder="Nom de la désignation"
-                        />
+                      <div className="flex items-center gap-4 mb-2">
+                        <div className="flex-1">
+                          <input
+                            type="text"
+                            value={designation.Name}
+                            onChange={e => handleDesignationChange(index, 'Name', e.target.value)}
+                            className="w-full p-2 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                            placeholder="Nom de la désignation"
+                          />
+                        </div>
+                        <div className="w-20">
+                          <input
+                            type="number"
+                            value={designation.quantity}
+                            onChange={e => handleDesignationChange(index, 'Quantity', e.target.value)}
+                            className="w-full p-1 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                            min="1"
+                          />
+                        </div>
                         {editedData.Designations.length > 1 && (
                           <button
                             type="button"
@@ -327,7 +359,10 @@ export function QuotationModal({
                         )}
                       </div>
                     ) : (
-                      <p className="font-medium text-gray-900">{designation.Name}</p>
+                      <div className="flex items-center gap-4">
+                        <p className="font-medium text-gray-900 flex-1">{designation.Name}</p>
+                        <span className="text-gray-600 text-sm">Qté : {designation.quantity}</span>
+                      </div>
                     )}
                     <div className="mt-2 space-y-2">
                       {designation.Products.map((product, productIndex) => (
@@ -337,7 +372,7 @@ export function QuotationModal({
                               <Select
                                 options={productOptions}
                                 value={productOptions.find(option => option.value === product.ProductId) || null}
-                                onChange={(selected) =>
+                                onChange={selected =>
                                   handleProductChange(index, productIndex, 'ProductId', selected?.value || 0)
                                 }
                                 placeholder="Sélectionner un produit..."
@@ -347,7 +382,7 @@ export function QuotationModal({
                               <input
                                 type="number"
                                 value={product.Quantity}
-                                onChange={(e) => handleProductChange(index, productIndex, 'Quantity', e.target.value)}
+                                onChange={e => handleProductChange(index, productIndex, 'Quantity', e.target.value)}
                                 className="w-20 p-1 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                                 min="1"
                               />

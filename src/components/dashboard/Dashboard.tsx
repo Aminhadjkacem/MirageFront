@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { Users, Truck, User, LogOut, ChevronDown, Calculator, Users2, Package,ShoppingCart, Settings } from 'lucide-react';
+import { Users, Truck, User, LogOut, ChevronDown, Users2, Package, ShoppingCart, Settings } from 'lucide-react';
 import type { UserType } from '../../App';
 
 type DashboardProps = {
@@ -12,12 +12,12 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <img src="logo.png" alt="Logo DHP Manager" className="h-10 w-10" />
+            <img src="LogoMirage.png" alt="Logo DHP Manager" className="h-10 w-10" />
             <h1 className="text-2xl font-semibold text-gray-900">Mirage</h1>
           </div>
 
@@ -50,7 +50,14 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+        {/* Welcome Message */}
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-900">
+            Bienvenue {user?.firstName} Chez DHP
+          </h2>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Clients Button */}
           <Link
@@ -113,6 +120,15 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
           </Link>
         </div>
       </main>
+
+      {/* Footer with Copyright */}
+      <footer className="bg-white shadow-inner py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-sm text-gray-500">
+            &copy; {new Date().getFullYear()} Mirage. Tous droits réservés.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

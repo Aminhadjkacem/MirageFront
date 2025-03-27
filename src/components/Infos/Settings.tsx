@@ -60,10 +60,6 @@ export default function Settings() {
     console.log(`Modification de ${field} en : ${value}`); // Translated debug log
     setFormData((prev) => {
       const newData = { ...prev, [field]: value };
-      toast.info(
-        `${field === 'profitMargin' ? 'Marge bénéficiaire' : field === 'tvaMargin' ? 'Marge TVA' : field === 'droitDuTimbrePrice' ? 'Droit de timbre' : field === 'companyTel' ? 'Téléphone de l’entreprise' : 'Identifiant fiscal de l’entreprise'} modifié en "${value || 'vide'}" (cliquez sur Enregistrer pour appliquer)`,
-        { autoClose: 2000 }
-      );
       return newData;
     });
   };

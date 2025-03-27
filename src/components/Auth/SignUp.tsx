@@ -60,12 +60,12 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">
         <div className="flex flex-col items-center">
           <img 
-            src="logo.png" 
-            alt="Logo DHP Manager" 
+            src="LogoMirage.png" 
+            alt="Logo Mirage" 
             className="h-16 w-16 mb-4"
           />
           <h2 className="text-center text-3xl font-extrabold text-gray-900">
-            DHP Manager
+            Mirage
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Créez votre compte

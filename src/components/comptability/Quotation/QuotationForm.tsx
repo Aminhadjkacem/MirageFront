@@ -27,6 +27,7 @@ export function QuotationForm({
     clientType: 'NORMAL' | 'COMPANY';
     designations: Array<{
       name: string;
+      quantity: number;
       products: Array<{ productId: number; quantity: number; productName?: string }>;
     }>;
   }>({
@@ -34,7 +35,7 @@ export function QuotationForm({
     customerName: '',
     customerId: '',
     clientType: 'NORMAL',
-    designations: [{ name: '', products: [{ productId: 0, quantity: 1, productName: '' }] }],
+    designations: [{ name: '', quantity: 1, products: [{ productId: 0, quantity: 1, productName: '' }] }],
   });
 
   const [errors, setErrors] = useState<{ projectName?: string; customer?: string; designations?: string }>({});
@@ -51,7 +52,7 @@ export function QuotationForm({
       ...formData,
       designations: [
         ...formData.designations,
-        { name: '', products: [{ productId: 0, quantity: 1, productName: '' }] },
+        { name: '', quantity: 1, products: [{ productId: 0, quantity: 1, productName: '' }] },
       ],
     });
   };
@@ -81,9 +82,13 @@ export function QuotationForm({
     }
   };
 
-  const updateDesignation = (index: number, name: string) => {
+  const updateDesignation = (index: number, field: 'name' | 'quantity', value: string | number) => {
     const newDesignations = [...formData.designations];
-    newDesignations[index].name = name;
+    if (field === 'name') {
+      newDesignations[index].name = value as string;
+    } else if (field === 'quantity') {
+      newDesignations[index].quantity = Math.max(1, value as number); // Ensure min 1
+    }
     setFormData({ ...formData, designations: newDesignations });
   };
 
@@ -99,7 +104,7 @@ export function QuotationForm({
       newDesignations[designationIndex].products[productIndex].productId = product.id;
       newDesignations[designationIndex].products[productIndex].productName = product.name;
     } else if (field === 'quantity') {
-      newDesignations[designationIndex].products[productIndex].quantity = Math.max(1, value as number); // Ensure min 1
+      newDesignations[designationIndex].products[productIndex].quantity = Math.max(1, value as number);
     }
     setFormData({ ...formData, designations: newDesignations });
   };
@@ -128,8 +133,12 @@ export function QuotationForm({
     if (!formData.projectName.trim()) newErrors.projectName = 'Le nom du projet est requis.';
     if (!formData.customerId) newErrors.customer = 'Veuillez sélectionner un client.';
     for (const designation of formData.designations) {
-      if (!designation.name.trim() || designation.products.some(p => p.productId === 0 || p.quantity <= 0)) {
-        newErrors.designations = 'Toutes les désignations doivent avoir un nom et des produits valides.';
+      if (
+        !designation.name.trim() ||
+        designation.quantity <= 0 ||
+        designation.products.some(p => p.productId === 0 || p.quantity <= 0)
+      ) {
+        newErrors.designations = 'Toutes les désignations doivent avoir un nom, une quantité valide et des produits valides.';
         break;
       }
     }
@@ -151,18 +160,17 @@ export function QuotationForm({
         CustomerId: Number(formData.customerId),
         Designations: formData.designations.map(d => ({
           Name: d.name,
+          Quantity: d.quantity,
           Products: d.products.map(p => ({
             ProductId: p.productId,
             Quantity: p.quantity,
           })),
         })),
       };
-      console.log('Envoi de la requête de devis:', JSON.stringify(quotationRequest, null, 2)); // Translated console log
+      console.log('Envoi de la requête de devis:', JSON.stringify(quotationRequest, null, 2));
       await onSubmit(quotationRequest);
-      // Success toast and form close handled by Devis.tsx
     } catch (error) {
-      console.error('Erreur lors de la création du devis:', error); // Translated console log
-      // No toast or onCancel here—let Devis.tsx handle it
+      console.error('Erreur lors de la création du devis:', error);
     }
   };
 
@@ -229,28 +237,45 @@ export function QuotationForm({
             className="border border-gray-200 rounded-md p-4 mb-4 bg-gray-50 relative"
           >
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nom de la désignation <span className="text-red-500">*</span>
-              </label>
-              <div className="flex gap-2 items-center">
-                <input
-                  type="text"
-                  value={designation.name}
-                  onChange={e => updateDesignation(designationIndex, e.target.value)}
-                  className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3"
-                  placeholder="ex. : Travaux électriques"
-                  required
-                />
-                {formData.designations.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeDesignation(designationIndex)}
-                    className="text-red-600 hover:text-red-800"
-                    title="Supprimer la désignation"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                )}
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Nom de la désignation <span className="text-red-500">*</span>
+                  </label>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      value={designation.name}
+                      onChange={e => updateDesignation(designationIndex, 'name', e.target.value)}
+                      className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3"
+                      placeholder="ex. : Travaux électriques"
+                      required
+                    />
+                    {formData.designations.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeDesignation(designationIndex)}
+                        className="text-red-600 hover:text-red-800"
+                        title="Supprimer la désignation"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <div className="w-1/4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Quantité <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={designation.quantity}
+                    min="1"
+                    onChange={e => updateDesignation(designationIndex, 'quantity', Number(e.target.value))}
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
