@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
-import { Users, Truck, User, LogOut, ChevronDown, Calculator, Users2, Package, Settings } from 'lucide-react';
+import { Users, Truck, User, LogOut, ChevronDown, Calculator, Users2, Package,ShoppingCart, Settings } from 'lucide-react';
 import type { UserType } from '../../App';
 
 type DashboardProps = {
@@ -84,13 +84,13 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
 
           {/* Comptabilité Button */}
           <Link
-            to="/comptability"
+            to="/AchatVente"
             className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col items-center space-y-4"
           >
             <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-              <Calculator className="h-8 w-8 text-red-600" />
+              <ShoppingCart className="h-8 w-8 text-red-600" />
             </div>
-            <span className="text-lg font-medium text-gray-900">Comptabilité</span>
+            <span className="text-lg font-medium text-gray-900">Achat/Vente</span>
           </Link>
 
           {/* RH Button */}

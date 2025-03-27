@@ -40,7 +40,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard user={user} onLogout={() => setUser(null)} />} />
               <Route path="/clients" element={<ClientManagement />} />
               <Route path="/products" element={<ProductManagement />} />
-              <Route path="/comptability/*" element={<Comptability />} />
+              <Route path="/AchatVente/*" element={<Comptability />} />
               <Route path="/settings" element={<Settings />} /> {/* Add this route */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </>
