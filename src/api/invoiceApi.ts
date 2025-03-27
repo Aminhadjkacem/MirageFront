@@ -28,6 +28,7 @@ interface RawQuotationResponse {
   CreatedAt: string;
   CustomerType: 'NORMAL' | 'COMPANY';
   CustomerDetails: CustomerDetails; // Could be string or CustomerDetails object
+  quantity: number; // Added quantity field
   Designations: {
     Id: number;
     Name: string;
@@ -56,6 +57,7 @@ export const getAllQuotations = async (): Promise<Quotation[]> => {
         ? { id: 0, FullName: raw.CustomerDetails }
         : raw.CustomerDetails,
       CreatedAt: raw.CreatedAt,
+      quantity: raw.quantity,
       Designations: raw.Designations.map(d => ({
         Id: d.Id,
         Name: d.Name,
