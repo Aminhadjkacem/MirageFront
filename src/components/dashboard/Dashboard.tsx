@@ -18,8 +18,10 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <img src="LogoMirage.png" alt="Logo DHP Manager" className="h-10 w-10" />
-            <h1 className="text-2xl font-semibold text-gray-900">Mirage</h1>
-          </div>
+            <h1 className="text-2xl font-semibold text-gray-900 flex items-center">
+              <span className="font-['Playfair_Display'] text-3xl tracking-wide bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent drop-shadow-md">irage</span>
+            </h1>          
+            </div>
 
           {/* Profile Menu */}
           <div className="relative">
@@ -52,11 +54,17 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
         {/* Welcome Message */}
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">
-            Bienvenue {user?.firstName} Chez DHP
-          </h2>
-        </div>
+        <div className="mb-6 text-center">
+  <h3 className="text-lg font-medium text-gray-900 leading-snug">
+    <span className="font-normal text-gray-700">Bienvenue</span>  
+    <span className="mx-1 text-[#DD2A1B]">{user?.firstName}</span>  
+    <span className="font-normal text-gray-700">chez</span>  
+    <span className="text-[#4B0082] font-medium"> Dynamique Habitat Publicité</span>
+    <span className="font-normal text-gray-700"> Management</span>  
+
+  </h3>
+</div>
+
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Clients Button */}
