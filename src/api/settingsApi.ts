@@ -18,6 +18,8 @@ interface Settings {
   DroitDuTimbrePrice: number;
   CompanyTel: string;
   CompanyFiscal: string;
+  BankRib: string; // Added
+  BankName: string;   // Added
   factureId: number;
 }
 
@@ -64,7 +66,7 @@ const settingsApi = {
   updateDroitDuTimbre: async (value: string): Promise<void> => {
     try {
       const response = await axiosInstance.put('/Settings/droit-du-timbre', `"${value}"`);
-      console.log(`PUT /Settings/droit-de-timbre with "${value}" succeeded with status: ${response.status} (No Content)`);
+      console.log(`PUT /Settings/droit-du-timbre with "${value}" succeeded with status: ${response.status} (No Content)`);
     } catch (error) {
       const axiosError = error as AxiosError;
       console.error(`Error updating droit du timbre with "${value}":`, axiosError);
@@ -92,6 +94,30 @@ const settingsApi = {
     } catch (error) {
       const axiosError = error as AxiosError;
       console.error(`Error updating company fiscal with "${value}":`, axiosError);
+      throw axiosError;
+    }
+  },
+
+  // PUT company-rib (204 No Content)
+  updateCompanyRib: async (value: string): Promise<void> => {
+    try {
+      const response = await axiosInstance.put('/Settings/company-rib', `"${value}"`);
+      console.log(`PUT /Settings/company-rib with "${value}" succeeded with status: ${response.status} (No Content)`);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      console.error(`Error updating company RIB with "${value}":`, axiosError);
+      throw axiosError;
+    }
+  },
+
+  // PUT bank-name (204 No Content)
+  updateBankName: async (value: string): Promise<void> => {
+    try {
+      const response = await axiosInstance.put('/Settings/bank-name', `"${value}"`);
+      console.log(`PUT /Settings/bank-name with "${value}" succeeded with status: ${response.status} (No Content)`);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      console.error(`Error updating bank name with "${value}":`, axiosError);
       throw axiosError;
     }
   },

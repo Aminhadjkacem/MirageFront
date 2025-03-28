@@ -11,6 +11,8 @@ interface Settings {
   DroitDuTimbrePrice: number;
   CompanyTel: string;
   CompanyFiscal: string;
+  BankRib: string; // Added
+  BankName: string;   // Added
   factureId: number;
 }
 
@@ -22,6 +24,8 @@ export default function Settings() {
     droitDuTimbrePrice: '',
     companyTel: '',
     companyFiscal: '',
+    BankRib: '', // Added
+    bankName: '',   // Added
   });
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState({
@@ -30,6 +34,8 @@ export default function Settings() {
     droitDuTimbrePrice: false,
     companyTel: false,
     companyFiscal: false,
+    BankRib: false, // Added
+    bankName: false,   // Added
   });
 
   // Fetch settings on mount
@@ -45,6 +51,8 @@ export default function Settings() {
           droitDuTimbrePrice: data.DroitDuTimbrePrice.toString(),
           companyTel: data.CompanyTel,
           companyFiscal: data.CompanyFiscal,
+          BankRib: data.BankRib, // Added
+          bankName: data.BankName,     // Added
         });
       } catch {
         toast.error('Échec du chargement des paramètres.');
@@ -68,7 +76,23 @@ export default function Settings() {
   const handleSave = async (field: keyof typeof formData) => {
     const value = formData[field];
     if (!value.trim()) {
-      toast.error(`${field === 'profitMargin' ? 'Marge bénéficiaire' : field === 'tvaMargin' ? 'Marge TVA' : field === 'droitDuTimbrePrice' ? 'Droit de timbre' : field === 'companyTel' ? 'Téléphone de l’entreprise' : 'Identifiant fiscal de l’entreprise'} ne peut pas être vide.`);
+      toast.error(
+        `${
+          field === 'profitMargin'
+            ? 'Marge bénéficiaire'
+            : field === 'tvaMargin'
+            ? 'Marge TVA'
+            : field === 'droitDuTimbrePrice'
+            ? 'Droit de timbre'
+            : field === 'companyTel'
+            ? 'Téléphone de l’entreprise'
+            : field === 'companyFiscal'
+            ? 'Identifiant fiscal de l’entreprise'
+            : field === 'BankRib'
+            ? 'RIB de l’entreprise'
+            : 'Nom de la banque'
+        } ne peut pas être vide.`
+      );
       return;
     }
 
@@ -90,15 +114,53 @@ export default function Settings() {
         case 'companyFiscal':
           await settingsApi.updateCompanyFiscal(value);
           break;
+        case 'BankRib': // Added
+          await settingsApi.updateCompanyRib(value);
+          break;
+        case 'bankName': // Added
+          await settingsApi.updateBankName(value);
+          break;
       }
-      toast.success(`${field === 'profitMargin' ? 'Marge bénéficiaire' : field === 'tvaMargin' ? 'Marge TVA' : field === 'droitDuTimbrePrice' ? 'Droit de timbre' : field === 'companyTel' ? 'Téléphone de l’entreprise' : 'Identifiant fiscal de l’entreprise'} mis à jour avec succès !`);
+      toast.success(
+        `${
+          field === 'profitMargin'
+            ? 'Marge bénéficiaire'
+            : field === 'tvaMargin'
+            ? 'Marge TVA'
+            : field === 'droitDuTimbrePrice'
+            ? 'Droit de timbre'
+            : field === 'companyTel'
+            ? 'Téléphone de l’entreprise'
+            : field === 'companyFiscal'
+            ? 'Identifiant fiscal de l’entreprise'
+            : field === 'BankRib'
+            ? 'RIB de l’entreprise'
+            : 'Nom de la banque'
+        } mis à jour avec succès !`
+      );
       setSettings((prev) => ({
         ...prev!,
         [field.charAt(0).toUpperCase() + field.slice(1)]:
           field.includes('Margin') || field === 'droitDuTimbrePrice' ? parseFloat(value) : value,
       }));
     } catch {
-      toast.error(`Échec de la mise à jour de ${field === 'profitMargin' ? 'Marge bénéficiaire' : field === 'tvaMargin' ? 'Marge TVA' : field === 'droitDuTimbrePrice' ? 'Droit de timbre' : field === 'companyTel' ? 'Téléphone de l’entreprise' : 'Identifiant fiscal de l’entreprise'}.`);
+      toast.error(
+        `Échec de la mise à jour de ${
+          field === 'profitMargin'
+            ? 'Marge bénéficiaire'
+            : field === 'tvaMargin'
+            ? 'Marge TVA'
+            : field === 'droitDuTimbrePrice'
+            ? 'Droit de timbre'
+            : field === 'companyTel'
+            ? 'Téléphone de l’entreprise'
+            : field === 'companyFiscal'
+            ? 'Identifiant fiscal de l’entreprise'
+            : field === 'BankRib'
+            ? 'RIB de l’entreprise'
+            : 'Nom de la banque'
+        }.`
+      );
     } finally {
       setSubmitting((prev) => ({ ...prev, [field]: false }));
     }
@@ -257,6 +319,58 @@ export default function Settings() {
                 disabled={submitting.companyFiscal}
               >
                 {submitting.companyFiscal ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Company RIB */}
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <label className="block text-sm font-medium text-gray-700 mb-2">RIB de l’entreprise</label>
+            <div className="flex items-center space-x-3">
+              <input
+                type="text"
+                value={formData.BankRib}
+                onChange={(e) => handleChange('BankRib', e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3"
+                placeholder="ex. : 12345678901234567890"
+                disabled={submitting.BankRib}
+              />
+              <button
+                onClick={() => handleSave('BankRib')}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                disabled={submitting.BankRib}
+              >
+                {submitting.BankRib ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Bank Name */}
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Nom de la banque</label>
+            <div className="flex items-center space-x-3">
+              <input
+                type="text"
+                value={formData.bankName}
+                onChange={(e) => handleChange('bankName', e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm py-2 px-3"
+                placeholder="ex. : Banque Nationale"
+                disabled={submitting.bankName}
+              />
+              <button
+                onClick={() => handleSave('bankName')}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                disabled={submitting.bankName}
+              >
+                {submitting.bankName ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Save className="h-4 w-4" />

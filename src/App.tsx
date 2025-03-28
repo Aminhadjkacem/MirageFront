@@ -7,7 +7,7 @@ import SignUp from './components/Auth/SignUp';
 import Dashboard from './components/dashboard/Dashboard';
 import ClientManagement from './components/client/ClientManagement';
 import ProductManagement from './components/products/ProductManagement';
-import Comptability from './components/comptability/index';
+import Comptability from './components/VenteAchat/index';
 import Settings from './components/Infos/Settings'; // Add this import
 
 export type UserType = {
