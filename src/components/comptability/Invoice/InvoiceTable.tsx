@@ -199,7 +199,7 @@ export function InvoiceTable({
                       <div className="space-y-2">
                         {devisItem.Designations.map((designation, index) => (
                           <div key={index} className="font-medium text-gray-900">
-                            {designation.Name}
+                            {designation.Name} (Qté : {designation.Quantity})
                           </div>
                         ))}
                       </div>

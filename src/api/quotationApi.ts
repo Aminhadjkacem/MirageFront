@@ -29,13 +29,14 @@ export interface DesignationRequest {
 export interface DesignationUpdateRequest {
   Id: number; // Required for update
   Name: string;
+  Quantity: number; // Added quantity field
   Products: QuotationProduct[];
 }
 
 export interface Designation {
   Id?: number; // Optional, included in response
   Name: string;
-  quantity: number; // Added quantity field
+  Quantity: number; // Added quantity field
   Products: QuotationProduct[];
 }
 
@@ -58,6 +59,7 @@ interface RawQuotationResponse {
   CustomerType: 'NORMAL' | 'COMPANY';
   CustomerDetails: CustomerDetails | string | null;
   Designations: Designation[];
+  Quantity: number; // Added quantity field
   TotalPrice: number;
   TotalPriceHT:number;
   Status: QuotationStatus;
@@ -131,6 +133,7 @@ export const updateQuotation = async (id: number, quotation: QuotationUpdateRequ
       Designations: quotation.Designations.map(d => ({
         Id: d.Id || 0,
         Name: d.Name,
+        Quantity: d.Quantity,
         Products: d.Products.map(p => ({
           ProductId: p.ProductId,
           Quantity: p.Quantity,
@@ -189,6 +192,7 @@ export const getAllQuotations = async (): Promise<Quotation[]> => {
         Designations: raw.Designations.map(d => ({
           Id: d.Id,
           Name: d.Name,
+          Quantity: d.Quantity,
           Products: d.Products.map(p => ({
             ProductId: p.ProductId,
             ProductName: p.ProductName || '',
@@ -203,6 +207,48 @@ export const getAllQuotations = async (): Promise<Quotation[]> => {
   } catch (error) {
     const axiosError = error as AxiosError;
     console.error('Error fetching quotations:', axiosError);
+    throw axiosError;
+  }
+};
+
+export const exportQuotationAsPdf = async (quotation: Quotation): Promise<void> => {
+  try {
+    const response = await apiClient.post(
+      '/Invoice/export-Devis',
+      {
+        Id: quotation.Id,
+        ProjectName: quotation.ProjectName,
+        CustomerType: quotation.CustomerType,
+        CustomerId: quotation.CustomerId,
+        Designations: quotation.Designations.map(d => ({
+          Id: d.Id,
+          Name: d.Name,
+          Quantity: d.Quantity,
+          Products: d.Products.map(p => ({
+            ProductId: p.ProductId,
+            Quantity: p.Quantity,
+          })),
+        })),
+        TotalPrice: quotation.TotalPrice,
+        TotalPriceHT: quotation.TotalPriceHT,
+      },
+      {
+        responseType: 'blob', // Important for handling binary data (PDF)
+      }
+    );
+
+    // Create a URL for the blob and trigger the download
+    const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `quotation_${quotation.Id}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url); // Clean up
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    console.error(`Error exporting quotation ${quotation.Id} as PDF:`, axiosError);
     throw axiosError;
   }
 };

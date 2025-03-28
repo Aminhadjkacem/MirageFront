@@ -39,7 +39,7 @@ export function QuotationModal({
     ...devisItem,
     Designations: devisItem.Designations.map(d => ({
       ...d,
-      Quantity: d.quantity || 1, // Default to 1 if Quantity isn’t provided
+      Quantity: d.Quantity, // Default to 1 if Quantity isn’t provided
     })),
   });
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -65,7 +65,7 @@ export function QuotationModal({
     if (field === 'Name') {
       newDesignations[index].Name = value as string;
     } else if (field === 'Quantity') {
-      newDesignations[index].quantity = Math.max(1, parseInt(value as string) || 1); // Ensure min 1
+      newDesignations[index].Quantity = Math.max(1, parseInt(value as string) || 1); // Ensure min 1
     }
     setEditedData({ ...editedData, Designations: newDesignations });
   };
@@ -90,7 +90,7 @@ export function QuotationModal({
       ...editedData,
       Designations: [
         ...editedData.Designations,
-        { Id: 0, Name: '', quantity: 1, Products: [{ ProductId: 0, Quantity: 1 }] }, // New designation with Quantity
+        { Id: 0, Name: '', Quantity: 1, Products: [{ ProductId: 0, Quantity: 1 }] }, // New designation with Quantity
       ],
     });
   };
@@ -130,7 +130,7 @@ export function QuotationModal({
       for (const designation of editedData.Designations) {
         if (
           !designation.Name.trim() ||
-          designation.quantity <= 0 || // Validate designation quantity
+          designation.Quantity <= 0 || // Validate designation quantity
           designation.Products.some(p => p.ProductId === 0 || p.Quantity <= 0)
         ) {
           toast.error('Toutes les désignations doivent avoir un nom, une quantité valide et des produits valides.', {
@@ -342,7 +342,7 @@ export function QuotationModal({
                         <div className="w-20">
                           <input
                             type="number"
-                            value={designation.quantity}
+                            value={designation.Quantity}
                             onChange={e => handleDesignationChange(index, 'Quantity', e.target.value)}
                             className="w-full p-1 rounded-md border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                             min="1"
@@ -361,7 +361,7 @@ export function QuotationModal({
                     ) : (
                       <div className="flex items-center gap-4">
                         <p className="font-medium text-gray-900 flex-1">{designation.Name}</p>
-                        <span className="text-gray-600 text-sm">Qté : {designation.quantity}</span>
+                        <span className="text-gray-600 text-sm">Qté : {designation.Quantity}</span>
                       </div>
                     )}
                     <div className="mt-2 space-y-2">

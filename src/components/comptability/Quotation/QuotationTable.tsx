@@ -12,12 +12,9 @@ interface QuotationTableProps {
   onShowQuotation: (devisItem: Quotation) => void;
   onEditQuotation: (devisItem: Quotation) => void;
   onDeleteQuotation: (id: number) => void;
+  onExportPDF: (quotation: Quotation) => void; // Add this prop to handle PDF export
   refreshQuotations?: () => void;
 }
-
-const exportToPDF = function () {
-  console.log('Exportation en PDF...'); // Translated console log
-};
 
 export function QuotationTable({
   devis,
@@ -25,6 +22,7 @@ export function QuotationTable({
   onShowQuotation,
   onEditQuotation,
   onDeleteQuotation,
+  onExportPDF, // Destructure the new prop
   refreshQuotations,
 }: QuotationTableProps) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -72,7 +70,7 @@ export function QuotationTable({
           refreshQuotations();
         }
       } catch (error) {
-        console.error(`Échec de la validation du devis ${validateId}:`, error); // Translated console log
+        console.error(`Échec de la validation du devis ${validateId}:`, error);
         toast.error(`Échec de la validation du devis ${validateId}.`, {
           position: "top-right",
           autoClose: 3000,
@@ -148,7 +146,7 @@ export function QuotationTable({
                 <td className="px-6 py-4 text-sm text-gray-900">
                   <div className="space-y-2">
                     {devisItem.Designations.map((designation, index) => (
-                      <div key={index} className="font-medium text-gray-900">{designation.Name}</div>
+                      <div key={index} className="font-medium text-gray-900">{designation.Name}(Qté : {designation.Quantity})</div>
                     ))}
                   </div>
                 </td>
@@ -186,7 +184,7 @@ export function QuotationTable({
                       <Eye className="h-5 w-5" />
                     </button>
                     <button
-                      onClick={exportToPDF}
+                      onClick={() => onExportPDF(devisItem)} // Use the passed prop
                       className="text-gray-600 hover:text-gray-900 hover:scale-110 transition-transform duration-150"
                       title="Exporter en PDF"
                     >

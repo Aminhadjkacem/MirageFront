@@ -143,7 +143,7 @@ export function InvoiceModal({
               <div className="space-y-4">
                 {invoiceItem.Designations.map((designation, index) => (
                   <div key={index} className="border-b pb-4 last:border-b-0">
-                    <p className="font-medium text-gray-900">{designation.Name}</p>
+                    <p className="font-medium text-gray-900">{designation.Name} (Qté {designation.Quantity})</p>
                     <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
                       {designation.Products.map((product, productIndex) => (
                         <div key={productIndex} className="flex items-center justify-between">

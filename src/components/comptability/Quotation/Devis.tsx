@@ -15,6 +15,7 @@ import {
   QuotationRequest,
   QuotationUpdateRequest,
   CustomerDetails,
+  exportQuotationAsPdf,
 } from '../../../api/quotationApi';
 import productsApi from '../../../api/products';
 import { getNormalClients, mapApiDataToNormal } from '../../../api/clientApi';
@@ -92,13 +93,13 @@ export default function Devis() {
       toast.success('Devis créé avec succès !');
     } catch (error) {
       const axiosError = error as AxiosError;
-      console.log('Erreur Axios brute:', axiosError); // Translated debug log
-      console.log('Données de la réponse:', axiosError.response?.data); // Translated debug log
+      console.log('Erreur Axios brute:', axiosError);
+      console.log('Données de la réponse:', axiosError.response?.data);
       const errorMessage = axiosError.response?.data
-        ? String(axiosError.response.data) // e.g., "Stock insuffisant..."
+        ? String(axiosError.response.data)
         : 'Échec de la création du devis en raison d’une erreur inconnue.';
       console.error('Échec de la création du devis:', axiosError);
-      toast.error(errorMessage); // Show detailed backend message
+      toast.error(errorMessage);
     }
   };
 
@@ -110,6 +111,7 @@ export default function Devis() {
         Designations: updatedDevis.Designations.map(d => ({
           Id: d.Id || 0,
           Name: d.Name,
+          Quantity: d.Quantity,
           Products: d.Products.map(p => ({
             ProductId: p.ProductId,
             Quantity: p.Quantity,
@@ -121,7 +123,7 @@ export default function Devis() {
         TotalPriceHT: updatedDevis.TotalPriceHT,
       };
 
-      console.log('Charge utile de la requête de mise à jour:', JSON.stringify(updateRequest, null, 2)); // Translated debug log
+      console.log('Charge utile de la requête de mise à jour:', JSON.stringify(updateRequest, null, 2));
       await updateQuotation(updatedDevis.Id, updateRequest);
 
       const client =
@@ -153,8 +155,7 @@ export default function Devis() {
 
       setDevis(devis.map(q => (q.Id === enrichedQuotation.Id ? enrichedQuotation : q)));
       setFilteredDevis(filteredDevis.map(q => (q.Id === enrichedQuotation.Id ? enrichedQuotation : q)));
-      console.log('Devis mis à jour:', enrichedQuotation); // Translated debug log
-      setSelectedQuotation(null);
+      console.log('Devis mis à jour:', enrichedQuotation);
       toast.success('Devis mis à jour avec succès !');
     } catch (error) {
       console.error('Échec de la mise à jour du devis:', error);
@@ -176,9 +177,20 @@ export default function Devis() {
     }
   };
 
-  const exportToPDF = () => {
-    console.log('Exportation en PDF...'); // Translated debug log
-    toast.info('Exportation PDF déclenchée (non implémentée pour l’instant).');
+  const exportToPDF = async (quotation: Quotation) => {
+    try {
+      await exportQuotationAsPdf(quotation);
+      toast.success(`Facture ${quotation.Id} exportée avec succès !`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } catch (error) {
+      console.error(`Échec de l'exportation de la facture ${quotation.Id} en PDF:`, error);
+      toast.error(`Échec de l'exportation de la facture ${quotation.Id}.`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
   };
 
   const showQuotation = (devisItem: Quotation) => {
@@ -198,7 +210,7 @@ export default function Devis() {
       <div className="px-4 py-5 sm:p-6">
         <DevisHeader
           onNewQuotationClick={() => {
-            console.log('Nouveau devis cliqué, activation du formulaire'); // Translated debug log
+            console.log('Nouveau devis cliqué, activation du formulaire');
             setShowForm(true);
           }}
         />
@@ -209,7 +221,7 @@ export default function Devis() {
             products={products}
             onSubmit={handleSubmit}
             onCancel={() => {
-              console.log('Annuler cliqué, désactivation du formulaire'); // Translated debug log
+              console.log('Annuler cliqué, désactivation du formulaire');
               setShowForm(false);
             }}
           />
@@ -221,6 +233,7 @@ export default function Devis() {
           onShowQuotation={showQuotation}
           onEditQuotation={editQuotation}
           onDeleteQuotation={handleDelete}
+          onExportPDF={exportToPDF} // Pass the exportToPDF function as a prop
           refreshQuotations={fetchQuotations}
         />
         {selectedQuotation && (
@@ -230,7 +243,7 @@ export default function Devis() {
             normalClients={normalClients}
             companyClients={companyClients}
             onClose={() => setSelectedQuotation(null)}
-            onExportPDF={exportToPDF}
+            onExportPDF={() => exportToPDF(selectedQuotation.item)}
             onDelete={handleDelete}
             onUpdate={handleUpdateQuotation}
             initialEditMode={selectedQuotation.editMode}

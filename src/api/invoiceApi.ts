@@ -32,6 +32,7 @@ interface RawQuotationResponse {
   Designations: {
     Id: number;
     Name: string;
+    Quantity: number; // Added quantity field
     Products: {
       ProductId: number;
       ProductName?: string;
@@ -61,6 +62,7 @@ export const getAllQuotations = async (): Promise<Quotation[]> => {
       Designations: raw.Designations.map(d => ({
         Id: d.Id,
         Name: d.Name,
+        Quantity: d.Quantity,
         Products: d.Products.map(p => ({
           ProductId: p.ProductId,
           ProductName: p.ProductName || '',
@@ -101,6 +103,7 @@ export const exportQuotationAsPdf = async (quotation: Quotation): Promise<void> 
         Designations: quotation.Designations.map(d => ({
           Id: d.Id,
           Name: d.Name,
+          Quantity: d.Quantity,
           Products: d.Products.map(p => ({
             ProductId: p.ProductId,
             Quantity: p.Quantity,
