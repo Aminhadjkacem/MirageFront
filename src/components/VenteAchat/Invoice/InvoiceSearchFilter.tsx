@@ -1,10 +1,10 @@
 // src/components/comptability/InvoiceSearchFilter.tsx
 import { useState, useMemo, useEffect } from 'react';
-import { Quotation, QuotationStatus } from '../../../api/quotationApi';
-
+import { QuotationStatus } from '../../../api/quotationApi';
+import {Invoice} from "../../../api/invoiceApi";
 interface InvoiceSearchFilterProps {
-  devis: Quotation[];
-  onFilterChange: (filteredDevis: Quotation[]) => void;
+  devis: Invoice[];
+  onFilterChange: (filteredDevis: Invoice[]) => void;
 }
 
 export function InvoiceSearchFilter({ devis, onFilterChange }: InvoiceSearchFilterProps) {

@@ -1,6 +1,6 @@
 // invoiceApi.ts
 import axios, { AxiosError } from 'axios';
-import { Quotation, QuotationStatus } from './quotationApi'; // Import types from quotationApi
+import { QuotationStatus } from './quotationApi'; // Import types from quotationApi
 
 const API_BASE_URL = 'https://localhost:7060/api';
 
@@ -10,6 +10,30 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+export interface Invoice {
+  Id: number;
+  ProjectName: string;
+  CustomerType: 'NORMAL' | 'COMPANY';
+  CustomerId: number;
+  CustomerDetails: CustomerDetails;
+  InvoiceCreatedAt: string;
+  Designations: Designation[];
+  TotalPrice: number;
+  TotalPriceHT: number;
+  Status: QuotationStatus;
+}
+export interface Designation {
+  Id?: number; // Optional, included in response
+  Name: string;
+  Quantity: number; // Added quantity field
+  Products: QuotationProduct[];
+}
+export interface QuotationProduct {
+  ProductId: number;
+  Quantity: number;
+  ProductName?: string; // Optional, included in response
+}
+
 export interface CustomerDetails {
     id: number;
     FullName?: string;
@@ -25,7 +49,7 @@ export interface CustomerDetails {
 interface RawQuotationResponse {
   Id: number;
   ProjectName: string;
-  CreatedAt: string;
+  InvoiceCreatedAt: string;
   CustomerType: 'NORMAL' | 'COMPANY';
   CustomerDetails: CustomerDetails; // Could be string or CustomerDetails object
   quantity: number; // Added quantity field
@@ -45,7 +69,7 @@ interface RawQuotationResponse {
 }
 
 // Get all quotations (unfiltered here, filtered in component)
-export const getAllQuotations = async (): Promise<Quotation[]> => {
+export const getAllQuotations = async (): Promise<Invoice[]> => {
   try {
     const response = await apiClient.get('/Quotations');
     console.log('GET /Quotations response:', response.data);
@@ -57,7 +81,7 @@ export const getAllQuotations = async (): Promise<Quotation[]> => {
       CustomerDetails: typeof raw.CustomerDetails === 'string'
         ? { id: 0, FullName: raw.CustomerDetails }
         : raw.CustomerDetails,
-      CreatedAt: raw.CreatedAt,
+      InvoiceCreatedAt: raw.InvoiceCreatedAt,
       quantity: raw.quantity,
       Designations: raw.Designations.map(d => ({
         Id: d.Id,
@@ -91,16 +115,16 @@ export const validateQuotation = async (id: number): Promise<void> => {
   }
 };
 // Export quotation as PDF
-export const exportQuotationAsPdf = async (quotation: Quotation): Promise<void> => {
+export const exportQuotationAsPdf = async (Invoice: Invoice): Promise<void> => {
   try {
     const response = await apiClient.post(
       '/Invoice/export-quotation',
       {
-        Id: quotation.Id,
-        ProjectName: quotation.ProjectName,
-        CustomerType: quotation.CustomerType,
-        CustomerId: quotation.CustomerId,
-        Designations: quotation.Designations.map(d => ({
+        Id: Invoice.Id,
+        ProjectName: Invoice.ProjectName,
+        CustomerType: Invoice.CustomerType,
+        CustomerId: Invoice.CustomerId,
+        Designations: Invoice.Designations.map(d => ({
           Id: d.Id,
           Name: d.Name,
           Quantity: d.Quantity,
@@ -109,8 +133,8 @@ export const exportQuotationAsPdf = async (quotation: Quotation): Promise<void> 
             Quantity: p.Quantity,
           })),
         })),
-        TotalPrice: quotation.TotalPrice,
-        TotalPriceHT: quotation.TotalPriceHT,
+        TotalPrice: Invoice.TotalPrice,
+        TotalPriceHT: Invoice.TotalPriceHT,
       },
       {
         responseType: 'blob', // Important for handling binary data (PDF)
@@ -121,14 +145,14 @@ export const exportQuotationAsPdf = async (quotation: Quotation): Promise<void> 
     const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `quotation_${quotation.Id}.pdf`);
+    link.setAttribute('download', `Invoice_${Invoice.Id}.pdf`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url); // Clean up
   } catch (error) {
     const axiosError = error as AxiosError;
-    console.error(`Error exporting quotation ${quotation.Id} as PDF:`, axiosError);
+    console.error(`Error exporting Invoice ${Invoice.Id} as PDF:`, axiosError);
     throw axiosError;
   }
 };

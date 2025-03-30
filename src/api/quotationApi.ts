@@ -55,7 +55,7 @@ export interface CustomerDetails {
 interface RawQuotationResponse {
   Id: number;
   ProjectName: string;
-  CreatedAt: string;
+  QuotationCreatedAt: string;
   CustomerType: 'NORMAL' | 'COMPANY';
   CustomerDetails: CustomerDetails | string | null;
   Designations: Designation[];
@@ -89,7 +89,7 @@ export interface Quotation {
   CustomerType: 'NORMAL' | 'COMPANY';
   CustomerId: number;
   CustomerDetails: CustomerDetails;
-  CreatedAt: string;
+  QuotationCreatedAt: string;
   Designations: Designation[];
   TotalPrice: number;
   TotalPriceHT: number;
@@ -111,7 +111,7 @@ export const createQuotation = async (quotation: QuotationRequest): Promise<Quot
         : raw.CustomerDetails === null
         ? { id: 0, FullName: 'Unknown Client' }
         : raw.CustomerDetails,
-      CreatedAt: raw.CreatedAt,
+      QuotationCreatedAt: raw.QuotationCreatedAt,
       Designations: raw.Designations,
       TotalPrice: raw.TotalPrice,
       TotalPriceHT:raw.TotalPriceHT,
@@ -188,7 +188,7 @@ export const getAllQuotations = async (): Promise<Quotation[]> => {
           : isCustomerDetailsNull
           ? { id: 0, FullName: 'Unknown Client' }
           : raw.CustomerDetails as CustomerDetails,
-        CreatedAt: raw.CreatedAt,
+        CreatedAt: raw.QuotationCreatedAt,
         Designations: raw.Designations.map(d => ({
           Id: d.Id,
           Name: d.Name,

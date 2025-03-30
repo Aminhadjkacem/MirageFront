@@ -1,13 +1,13 @@
 import { useState, MouseEvent } from 'react';
 import { FileDown, Trash, X } from 'lucide-react';
-import { Quotation, QuotationStatus } from '../../../api/quotationApi';
+import { QuotationStatus } from '../../../api/quotationApi';
 import { Product } from '../../../types/product';
 import { ConfirmationModal } from './ConfirmationModal';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import {Invoice} from "../../../api/invoiceApi";
 interface InvoiceModalProps {
-  invoiceItem: Quotation;
+  invoiceItem: Invoice;
   products: Product[];
   onClose: () => void;
   onExportPDF: () => void;
@@ -133,7 +133,7 @@ export function InvoiceModal({
               <h4 className="text-sm font-medium text-gray-700 mb-2">Informations sur le projet</h4>
               <p className="text-gray-900 font-medium">{invoiceItem.ProjectName}</p>
               <p className="text-sm text-gray-600 mt-1">
-                Créée le : {new Date(invoiceItem.CreatedAt).toLocaleDateString('fr-FR')}
+                Créée le : {new Date(invoiceItem.InvoiceCreatedAt).toLocaleDateString('fr-FR')}
               </p>
             </section>
 

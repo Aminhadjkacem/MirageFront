@@ -1,20 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Eye, FileDown, Trash } from 'lucide-react';
-import { Quotation, QuotationStatus } from '../../../api/quotationApi';
+import { QuotationStatus } from '../../../api/quotationApi';
 import { exportQuotationAsPdf } from '../../../api/invoiceApi'; // Import the new method
 import { Product } from '../../../types/product';
 import { NormalClient, CompanyClient } from '../../../types/client';
 import { ConfirmationModal } from './ConfirmationModal';
-import { getAllQuotations, deleteQuotation } from '../../../api/quotationApi';
+import { deleteQuotation } from '../../../api/quotationApi';
+import { getAllQuotations } from '../../../api/invoiceApi'; // Import the new method
 import { InvoiceModal } from './InvoiceModal';
 import { InvoiceSearchFilter } from './InvoiceSearchFilter';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {Invoice} from "../../../api/invoiceApi";
 
 interface InvoiceTableProps {
-  devis?: Quotation[];
+  devis?: Invoice[];
   isLoading?: boolean;
-  onShowInvoice?: (devisItem: Quotation) => void;
+  onShowInvoice?: (devisItem: Invoice) => void;
   onDeleteInvoice?: (id: number) => void;
   products?: Product[];
   normalClients?: NormalClient[];
@@ -30,12 +32,12 @@ export function InvoiceTable({
   products = [],
   refreshInvoices: parentRefreshInvoices,
 }: InvoiceTableProps) {
-  const [devis, setDevis] = useState<Quotation[]>(propDevis || []);
-  const [filteredDevis, setFilteredDevis] = useState<Quotation[]>([]);
+  const [devis, setDevis] = useState<Invoice[]>(propDevis || []);
+  const [filteredDevis, setFilteredDevis] = useState<Invoice[]>([]);
   const [isLoading, setIsLoading] = useState(propIsLoading || false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [selectedInvoice, setSelectedInvoice] = useState<Quotation | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
   useEffect(() => {
     if (!propDevis) {
@@ -61,7 +63,7 @@ export function InvoiceTable({
     }
   };
 
-  const handleFilterChange = (filtered: Quotation[]) => {
+  const handleFilterChange = (filtered: Invoice[]) => {
     setFilteredDevis(filtered);
   };
 
@@ -95,28 +97,28 @@ export function InvoiceTable({
     }
   };
 
-  const handleShowInvoice = (devisItem: Quotation) => {
+  const handleShowInvoice = (devisItem: Invoice) => {
     setSelectedInvoice(devisItem);
     onShowInvoice(devisItem);
   };
 
-  const exportToPDF = async (quotation: Quotation) => {
+  const exportToPDF = async (Invoice: Invoice) => {
     try {
-      await exportQuotationAsPdf(quotation);
-      toast.success(`Facture ${quotation.Id} exportée avec succès !`, {
+      await exportQuotationAsPdf(Invoice);
+      toast.success(`Facture ${Invoice.Id} exportée avec succès !`, {
         position: "top-right",
         autoClose: 3000,
       });
     } catch (error) {
-      console.error(`Échec de l'exportation de la facture ${quotation.Id} en PDF:`, error);
-      toast.error(`Échec de l'exportation de la facture ${quotation.Id}.`, {
+      console.error(`Échec de l'exportation de la facture ${Invoice.Id} en PDF:`, error);
+      toast.error(`Échec de l'exportation de la facture ${Invoice.Id}.`, {
         position: "top-right",
         autoClose: 3000,
       });
     }
   };
 
-  const getClientName = (devisItem: Quotation): string => {
+  const getClientName = (devisItem: Invoice): string => {
     if (typeof devisItem.CustomerDetails === 'string') {
       return devisItem.CustomerDetails;
     }
@@ -218,7 +220,7 @@ export function InvoiceTable({
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatDate(devisItem.CreatedAt)}
+                      {formatDate(devisItem.InvoiceCreatedAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {devisItem.TotalPrice.toFixed(2)} TND

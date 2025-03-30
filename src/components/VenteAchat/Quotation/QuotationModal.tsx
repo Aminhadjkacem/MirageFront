@@ -318,7 +318,7 @@ export function QuotationModal({
                 <p className="text-gray-900 font-medium">{devisItem.ProjectName}</p>
               )}
               <p className="text-sm text-gray-600 mt-1">
-                Créé le : {new Date(devisItem.CreatedAt).toLocaleDateString('fr-FR')}
+                Créé le : {new Date(devisItem.QuotationCreatedAt).toLocaleDateString('fr-FR')}
               </p>
             </section>
 
