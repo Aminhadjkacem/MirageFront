@@ -10,6 +10,15 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token'); // Retrieve token from local storage (or another storage method)
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
 export interface Invoice {
   Id: number;
   ProjectName: string;

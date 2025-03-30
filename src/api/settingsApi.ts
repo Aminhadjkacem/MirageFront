@@ -10,7 +10,15 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 });
-
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token'); // Retrieve token from local storage (or another storage method)
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
 // Define the Settings interface based on the GET response
 interface Settings {
   ProfitMargin: number;
