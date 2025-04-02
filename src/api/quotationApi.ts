@@ -10,7 +10,7 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token'); // Retrieve token from local storage (or another storage method)
+  const token = localStorage.getItem('user'); // Retrieve token from local storage (or another storage method)
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -98,7 +98,7 @@ export interface Quotation {
   CustomerType: 'NORMAL' | 'COMPANY';
   CustomerId: number;
   CustomerDetails: CustomerDetails;
-  QuotationCreatedAt: string;
+  CreatedAt: string;
   Designations: Designation[];
   TotalPrice: number;
   TotalPriceHT: number;
@@ -120,7 +120,7 @@ export const createQuotation = async (quotation: QuotationRequest): Promise<Quot
         : raw.CustomerDetails === null
         ? { id: 0, FullName: 'Unknown Client' }
         : raw.CustomerDetails,
-      QuotationCreatedAt: raw.QuotationCreatedAt,
+      CreatedAt: raw.QuotationCreatedAt,
       Designations: raw.Designations,
       TotalPrice: raw.TotalPrice,
       TotalPriceHT:raw.TotalPriceHT,

@@ -27,6 +27,8 @@ export default function Login({ onLogin, onSwitchToSignUp }: LoginProps) {
     setError(null);
     try {
       const response = await axiosInstance.post('Users/authenticate', { username, password });
+      localStorage.setItem('user', JSON.stringify(response.data));
+
       onLogin(response.data);
     } catch (err) {
       console.error('Échec de la connexion:', err); // Translated console log

@@ -32,7 +32,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
               <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
                 <User className="h-6 w-6 text-white" />
               </div>
-              <span className="text-gray-700 font-medium">{user?.firstName}</span>
+              <span className="text-gray-700 font-medium">{user?.FirstName}</span>
               <ChevronDown className="h-5 w-5 text-gray-500" />
             </button>
 
@@ -57,7 +57,7 @@ export default function Dashboard({ user, onLogout }: DashboardProps) {
         <div className="mb-6 text-center">
   <h3 className="text-lg font-medium text-gray-900 leading-snug">
     <span className="font-normal text-gray-700">Bienvenue</span>  
-    <span className="mx-1 text-[#DD2A1B]">{user?.firstName}</span>  
+    <span className="mx-1 text-[#DD2A1B]">{user?.FirstName}</span>  
     <span className="font-normal text-gray-700">chez</span>  
     <span className="text-[#4B0082] font-medium"> Dynamique Habitat Publicité</span>
     <span className="font-normal text-gray-700"> Management</span>  

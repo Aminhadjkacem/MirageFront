@@ -17,8 +17,8 @@ type SignUpProps = {
 };
 
 export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [FirstName, setFirstName] = useState('');
+  const [LastName, setLastName] = useState('');
   const [mail, setMail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -31,8 +31,8 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
   
     try {
       const response = await axiosInstance.post('/Users/register', {
-        firstName,
-        lastName,
+        FirstName,
+        LastName,
         mail,
         password,
       });
@@ -40,9 +40,10 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
       // Assuming the response contains user data
       const userData = response.data;
       console.log('Données utilisateur:', userData); // Translated console log
-      
+      localStorage.setItem('user', JSON.stringify(response.data));
+
       // Call the onSignUp function with the user data
-      onSignUp({ firstName, lastName, email: mail });
+      onSignUp({ FirstName, LastName, Email: mail });
     } catch (err) {
       // If the error is an Axios error, handle it
       if (axios.isAxiosError(err)) {
@@ -85,32 +86,32 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="firstName" className="sr-only">
+              <label htmlFor="FirstName" className="sr-only">
                 Prénom
               </label>
               <input
-                id="firstName"
-                name="firstName"
+                id="FirstName"
+                name="FirstName"
                 type="text"
                 required
                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Prénom"
-                value={firstName}
+                value={FirstName}
                 onChange={(e) => setFirstName(e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="lastName" className="sr-only">
+              <label htmlFor="LastName" className="sr-only">
                 Nom
               </label>
               <input
-                id="lastName"
-                name="lastName"
+                id="LastName"
+                name="LastName"
                 type="text"
                 required
                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Nom"
-                value={lastName}
+                value={LastName}
                 onChange={(e) => setLastName(e.target.value)}
               />
             </div>

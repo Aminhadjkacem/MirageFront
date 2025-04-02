@@ -11,9 +11,9 @@ import Comptability from './components/VenteAchat/index';
 import Settings from './components/Infos/Settings'; // Add this import
 
 export type UserType = {
-  firstName: string;
-  lastName: string;
-  email: string;
+  FirstName: string;
+  LastName: string;
+  Email: string;
 };
 
 function App() {

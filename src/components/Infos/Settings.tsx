@@ -13,7 +13,7 @@ interface Settings {
   CompanyFiscal: string;
   BankRib: string; // Added
   BankName: string;   // Added
-  factureId: number;
+  FactureId: number;
 }
 
 export default function Settings() {
@@ -25,7 +25,8 @@ export default function Settings() {
     companyTel: '',
     companyFiscal: '',
     BankRib: '', // Added
-    bankName: '',   // Added
+    bankName: '',
+    FactureId: ''   // Added
   });
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState({
@@ -52,7 +53,8 @@ export default function Settings() {
           companyTel: data.CompanyTel,
           companyFiscal: data.CompanyFiscal,
           BankRib: data.BankRib, // Added
-          bankName: data.BankName,     // Added
+          bankName: data.BankName, 
+          FactureId: data.FactureId,    // Added
         });
       } catch {
         toast.error('Échec du chargement des paramètres.');
@@ -384,7 +386,7 @@ export default function Settings() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Identifiant actuel de facture</label>
             <input
               type="number"
-              value={settings?.factureId || 0}
+              value={settings?.FactureId || 0}
               className="block w-full rounded-md border-gray-300 bg-gray-100 text-sm py-2 px-3"
               disabled
             />

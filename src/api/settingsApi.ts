@@ -11,7 +11,7 @@ const axiosInstance = axios.create({
   },
 });
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token'); // Retrieve token from local storage (or another storage method)
+  const token = localStorage.getItem('user'); // Retrieve token from local storage (or another storage method)
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -28,7 +28,7 @@ interface Settings {
   CompanyFiscal: string;
   BankRib: string; // Added
   BankName: string;   // Added
-  factureId: number;
+  FactureId: number;
 }
 
 // Settings API object

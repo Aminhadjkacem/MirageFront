@@ -164,7 +164,7 @@ export function QuotationTable({
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {formatDate(devisItem.QuotationCreatedAt)}
+                  {formatDate(devisItem.CreatedAt)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {devisItem.TotalPriceHT.toFixed(2)} TND
