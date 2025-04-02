@@ -9,13 +9,7 @@ import ClientManagement from './components/client/ClientManagement';
 import ProductManagement from './components/products/ProductManagement';
 import Comptability from './components/VenteAchat/index';
 import Settings from './components/Infos/Settings'; // Add this import
-
-export type UserType = {
-  FirstName: string;
-  LastName: string;
-  Email: string;
-};
-
+import { UserType } from './types/user';
 function App() {
   const [user, setUser] = useState<UserType | null>(null);
 

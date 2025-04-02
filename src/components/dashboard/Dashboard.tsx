@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { Users, Truck, User, LogOut, ChevronDown, Users2, Package, ShoppingCart, Settings } from 'lucide-react';
-import type { UserType } from '../../App';
+import type { UserType } from '../../types/user'; // Adjust the import path as necessary
 
 type DashboardProps = {
   user: UserType;
@@ -10,6 +10,7 @@ type DashboardProps = {
 
 export default function Dashboard({ user, onLogout }: DashboardProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  console.log(user);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">

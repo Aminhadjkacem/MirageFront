@@ -10,7 +10,9 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('user'); // Retrieve token from local storage (or another storage method)
+  const storedUser = localStorage.getItem("user");
+  const userData = storedUser ? JSON.parse(storedUser) : null;
+  const token = userData?.Token; // Retrieve token from local storage
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -250,14 +252,14 @@ export const exportQuotationAsPdf = async (quotation: Quotation): Promise<void> 
     const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `quotation_${quotation.Id}.pdf`);
+    link.setAttribute('download', `quotation_${quotation.CustomerDetails.FullName}.pdf`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url); // Clean up
   } catch (error) {
     const axiosError = error as AxiosError;
-    console.error(`Error exporting quotation ${quotation.Id} as PDF:`, axiosError);
+    console.error(`Error exporting quotation ${quotation.CustomerDetails.FullName} as PDF:`, axiosError);
     throw axiosError;
   }
 };

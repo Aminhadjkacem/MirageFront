@@ -1,15 +1,8 @@
+// SignUp.tsx
 import React, { useState } from 'react';
 import { UserPlus, LogIn } from 'lucide-react';
-import type { UserType } from '../../App';
-import axios from 'axios';
-
-const API_BASE_URL = 'https://localhost:7060';
-const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import { UserType } from '../../types/user';
+import { signUp } from '../../services/authService';
 
 type SignUpProps = {
   onSignUp: (user: UserType) => void;
@@ -17,8 +10,8 @@ type SignUpProps = {
 };
 
 export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
-  const [FirstName, setFirstName] = useState('');
-  const [LastName, setLastName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [mail, setMail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -28,29 +21,12 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-  
-    try {
-      const response = await axiosInstance.post('/Users/register', {
-        FirstName,
-        LastName,
-        mail,
-        password,
-      });
-  
-      // Assuming the response contains user data
-      const userData = response.data;
-      console.log('Données utilisateur:', userData); // Translated console log
-      localStorage.setItem('user', JSON.stringify(response.data));
 
-      // Call the onSignUp function with the user data
-      onSignUp({ FirstName, LastName, Email: mail });
+    try {
+      const userData = await signUp(firstName, lastName, mail, password);
+      onSignUp(userData);
     } catch (err) {
-      // If the error is an Axios error, handle it
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || 'Échec de l’inscription');
-      } else {
-        setError('Une erreur s’est produite lors de l’inscription');
-      }
+      setError(err instanceof Error ? err.message : 'Une erreur inattendue s’est produite');
     } finally {
       setIsLoading(false);
     }
@@ -86,32 +62,32 @@ export default function SignUp({ onSignUp, onSwitchToLogin }: SignUpProps) {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
-              <label htmlFor="FirstName" className="sr-only">
+              <label htmlFor="firstName" className="sr-only">
                 Prénom
               </label>
               <input
-                id="FirstName"
-                name="FirstName"
+                id="firstName"
+                name="firstName"
                 type="text"
                 required
                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Prénom"
-                value={FirstName}
+                value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="LastName" className="sr-only">
+              <label htmlFor="lastName" className="sr-only">
                 Nom
               </label>
               <input
-                id="LastName"
-                name="LastName"
+                id="lastName"
+                name="lastName"
                 type="text"
                 required
                 className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Nom"
-                value={LastName}
+                value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
               />
             </div>

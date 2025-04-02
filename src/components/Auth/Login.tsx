@@ -1,16 +1,8 @@
+// Login.tsx
 import { LogIn, UserPlus } from 'lucide-react';
-import axios from 'axios';
-import type { UserType } from '../../App';
 import { useState } from 'react';
-
-const API_BASE_URL = 'https://localhost:7060';
-
-const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+import { UserType } from '../../types/user';
+import { login } from '../../services/authService';
 
 type LoginProps = {
   onLogin: (user: UserType) => void;
@@ -21,18 +13,21 @@ export default function Login({ onLogin, onSwitchToSignUp }: LoginProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false); // Added loading state
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    try {
-      const response = await axiosInstance.post('Users/authenticate', { username, password });
-      localStorage.setItem('user', JSON.stringify(response.data));
+    setIsLoading(true);
 
-      onLogin(response.data);
+    try {
+      const userData = await login(username, password);
+      onLogin(userData);
     } catch (err) {
-      console.error('Échec de la connexion:', err); // Translated console log
-      setError('Nom d’utilisateur ou mot de passe incorrect');
+      console.error('Échec de la connexion:', err);
+      setError(err instanceof Error ? err.message : 'Une erreur inattendue s’est produite');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -57,6 +52,7 @@ export default function Login({ onLogin, onSwitchToSignUp }: LoginProps) {
                 placeholder="Nom d’utilisateur"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -70,6 +66,7 @@ export default function Login({ onLogin, onSwitchToSignUp }: LoginProps) {
                 placeholder="Mot de passe"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -77,12 +74,13 @@ export default function Login({ onLogin, onSwitchToSignUp }: LoginProps) {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              disabled={isLoading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed"
             >
               <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                 <LogIn className="h-5 w-5 text-blue-500 group-hover:text-blue-400" />
               </span>
-              Se connecter
+              {isLoading ? 'Connexion en cours...' : 'Se connecter'}
             </button>
           </div>
         </form>
@@ -90,6 +88,7 @@ export default function Login({ onLogin, onSwitchToSignUp }: LoginProps) {
           <button
             onClick={onSwitchToSignUp}
             className="text-sm text-blue-600 hover:text-blue-500 flex items-center justify-center gap-2 w-full"
+            disabled={isLoading}
           >
             <UserPlus className="h-4 w-4" />
             Créer un nouveau compte
