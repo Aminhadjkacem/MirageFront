@@ -146,6 +146,7 @@ export const exportQuotationAsPdf = async (Invoice: Invoice): Promise<void> => {
         })),
         TotalPrice: Invoice.TotalPrice,
         TotalPriceHT: Invoice.TotalPriceHT,
+        InvoiceCreatedAt: Invoice.InvoiceCreatedAt
       },
       {
         responseType: 'blob', // Important for handling binary data (PDF)

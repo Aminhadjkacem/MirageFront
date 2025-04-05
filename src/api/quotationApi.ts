@@ -242,6 +242,7 @@ export const exportQuotationAsPdf = async (quotation: Quotation): Promise<void> 
         })),
         TotalPrice: quotation.TotalPrice,
         TotalPriceHT: quotation.TotalPriceHT,
+        QuotationCreatedAt: quotation.CreatedAt
       },
       {
         responseType: 'blob', // Important for handling binary data (PDF)
